@@ -1,0 +1,145 @@
+// Copyright © 2015 Hansoft AB 
+// Distributed under the MIT license, see license text in LICENSE.Malterlib
+
+Import "../Core/Lib_Malterlib.MTarget"
+
+%Group "{Malterlib}/{Lib_Malterlib_SQL}"
+{
+	%Group SQL
+	{
+		%Group Include
+		{
+			Compile.Type "C++"
+			{
+				!!DocumentationEnabled true
+			}
+			%File "Include/Mib/SQL/^*"
+		}
+		%File "Source/Malterlib_SQL.*"
+		%Group Documentation
+		{
+			%File "Documentation/*"
+		}
+	}
+}
+
+
+Property
+{
+	MalterlibLibrary_SQL true
+	{
+		&
+		{
+			MalterlibLibrary_SQL ""
+			MalterlibLibrary_All true
+		}
+	}
+	MalterlibSubLibraries "SQL;@(MalterlibSubLibraries)"
+	{
+		!!MalterlibLibrary_SQL true
+	}
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL true
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_SQL true
+	MalterlibIncludeRoots "@('Include'->MakeAbsolute());@(MalterlibIncludeRoots)"
+	{
+		!!MalterlibLibrary_SQL true
+	}
+}
+
+Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
+Import "../../SDK/zlib/Lib_zlib.MTarget"
+
+///////////
+// MySQL
+%Group "{Malterlib}/{Lib_Malterlib_SQL_MySQL}"
+{
+	Compile
+	{
+		!!CompileDialect "C"
+		SearchPath "@('../../SDK/mariadb-connector/include'->MakeAbsolute());@(Compile.SearchPath)"
+	}
+	%Group SQL_MySql
+	{
+		%File "Source/Malterlib_SQL_MySQL.cpp"
+	}
+	%Dependency "Lib_MariaDBConnector"
+	{
+		Dependency.Indirect true
+	}
+	%Dependency "Lib_zlib"
+	{
+		Dependency.Indirect true
+	}
+}
+
+
+Property
+{
+	MalterlibLibrary_SQL_MySQL true
+	{
+		&
+		{
+			MalterlibLibrary_SQL_MySQL ""
+			MalterlibLibrary_All true
+		}
+	}
+	MalterlibSubLibraries "SQL_MySQL;@(MalterlibSubLibraries)"
+	{
+		!!MalterlibLibrary_SQL_MySQL true
+	}
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_MySQL true
+}
+
+///////////
+// SQLite
+%Group "{Malterlib}/{Lib_Malterlib_SQL_SQLite}"
+{
+	%Group SDK
+	{
+		%Group SQLite
+		{
+			%File ../../SDK/SQLite/sqlite3.c
+			%File ../../SDK/SQLite/sqlite3.h
+			%File ../../SDK/SQLite/sqlite3ext.h
+		}
+	}
+	%Group SQL_SQLite
+	{
+		%File "Source/Malterlib_SQL_SQLite.cpp"
+	}
+}
+
+
+Property
+{
+	MalterlibLibrary_SQL_SQLite true
+	{
+		&
+		{
+			MalterlibLibrary_SQL_SQLite ""
+			MalterlibLibrary_All true
+		}
+	}
+	MalterlibSubLibraries "SQL_SQLite;@(MalterlibSubLibraries)"
+	{
+		!!MalterlibLibrary_SQL_SQLite true
+	}
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_SQLite true
+}
+
+%Group "{Test}/{Malterlib_SQL}"
+{
+	%Dependency Lib_Malterlib_SQL_MySQL
+	%Dependency Lib_Malterlib_SQL_SQLite
+}
+
+Property
+{
+	!!MalterlibEnableInternalTests true
+	
+	MalterlibTests "Malterlib_SQL;@(MalterlibTests)"
+	MalterlibTestFiles_Malterlib_SQL "@('Test/*'->MakeAbsolute())"
+	MalterlibTestDependencies_Malterlib_SQL "Lib_Malterlib_SQL"
+	MalterlibTestExtraGroups_Malterlib_SQL "{Test}/{Malterlib_SQL}"
+}
+
