@@ -129,6 +129,7 @@ Property
 
 %Group "{Test}/{Malterlib_SQL}"
 {
+	Property.MalterlibLinkWithOpenSSL true
 	%Dependency Lib_Malterlib_SQL_MySQL
 	%Dependency Lib_Malterlib_SQL_SQLite
 }
