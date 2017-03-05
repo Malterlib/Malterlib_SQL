@@ -64,10 +64,12 @@ Import "../../SDK/zlib/Lib_zlib.MTarget"
 	}
 	%Dependency "Lib_MariaDBConnector"
 	{
+		!DocumentationEnabled true
 		Dependency.Indirect true
 	}
 	%Dependency "Lib_zlib"
 	{
+		!DocumentationEnabled true
 		Dependency.Indirect true
 	}
 }
