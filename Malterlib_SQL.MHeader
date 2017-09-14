@@ -47,7 +47,6 @@ Property
 }
 
 Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
-Import "../../SDK/zlib/Lib_zlib.MTarget"
 
 ///////////
 // MySQL
