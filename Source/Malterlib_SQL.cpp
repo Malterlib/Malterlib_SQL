@@ -1,4 +1,4 @@
-﻿// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB 
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include "Malterlib_SQL.h"
@@ -134,7 +134,7 @@ namespace NMib
 		aint CSQLConnection::CWorkerThread::f_Main()
 		{
 			m_EventWantQuit.f_ReportTo(&m_Event);
-			auto *pImp = NMib::fg_CreateRuntimeType<CDatabaseImplementation>(m_pSQLConnection->mp_Implementation);
+			auto pImp = NMib::fg_CreateRuntimeType<CDatabaseImplementation>(m_pSQLConnection->mp_Implementation);
 
 			if (pImp)
 			{
@@ -144,7 +144,7 @@ namespace NMib
 					{
 						if (m_pTask)
 						{
-							m_pTask->f_Run(pImp);
+							m_pTask->f_Run(pImp.f_Get());
 							m_pTask = nullptr;
 							{
 								DMibLock(m_pSQLConnection->mp_ThreadsLock);
@@ -157,7 +157,7 @@ namespace NMib
 				}
 
 				pImp->f_Destroy(true);
-				delete pImp;
+				pImp.f_Clear();
 			}
 
 			{
@@ -199,7 +199,7 @@ namespace NMib
 			if (mp_pMainImp)
 			{
 				mp_pMainImp->f_Destroy(false);
-				delete mp_pMainImp;
+				mp_pMainImp.f_Clear();
 			}
 			mp_Implementation = _pImplementation;
 			mp_Parameters = _Parameters;			
@@ -247,8 +247,7 @@ namespace NMib
 			if (mp_pMainImp)
 			{
 				mp_pMainImp->f_Destroy(false);
-				delete mp_pMainImp;
-				mp_pMainImp = nullptr;
+				mp_pMainImp.f_Clear();
 			}
 		}
 
@@ -316,7 +315,7 @@ namespace NMib
 
 		CTransactionResult *CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction)
 		{
-			return fp_CommitTransaction(_pTransaction, mp_pMainImp);
+			return fp_CommitTransaction(_pTransaction, mp_pMainImp.f_Get());
 		}
 
 		// Async transactions

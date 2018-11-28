@@ -1,4 +1,4 @@
-﻿// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB 
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
@@ -225,7 +225,7 @@ namespace NMib
 			
 			NStr::CStr mp_Implementation;
 			NRegistry::CRegistry_CStr mp_Parameters;
-			CDatabaseImplementation *mp_pMainImp;
+			NPtr::TCUniquePointer<CDatabaseImplementation> mp_pMainImp;
 		public:
 
 			CSQLConnection();
