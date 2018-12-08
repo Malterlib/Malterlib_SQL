@@ -1,4 +1,4 @@
-﻿// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB 
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 /***********************************************************************************
@@ -30,7 +30,7 @@ class CMySqlQueryResult : public CQueryResult
 
 public:
 
-	typedef NMib::NContainer::TCVariant<int64, fp64, CStr> CValue;
+	typedef NMib::NStorage::TCVariant<int64, fp64, CStr> CValue;
 
 	struct CRow
 	{
@@ -232,7 +232,7 @@ public:
 	MYSQL m_Conn;
 	MYSQL *m_pConn;
 	
-	virtual bint f_Create(const NMib::NRegistry::CRegistry_CStr &_Parameters)
+	virtual bint f_Create(const NMib::NContainer::CRegistry_CStr &_Parameters)
 	{
         m_pConn = mysql_init(&m_Conn);
 		ms_MainThreadCleanup.m_bDoneInit = true;

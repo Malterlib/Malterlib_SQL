@@ -4,8 +4,8 @@
 #include <Mib/SQL/SQL>
 
 using namespace NMib::NStr;
-using namespace NMib::NPtr;
-using namespace NMib::NRegistry;
+using namespace NMib::NStorage;
+using namespace NMib::NContainer;
 
 using NMib::fg_Explicit;
 

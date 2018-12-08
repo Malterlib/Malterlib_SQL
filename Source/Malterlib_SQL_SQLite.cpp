@@ -16,7 +16,7 @@ using namespace NSQL;
 using namespace NStr;
 using namespace NContainer;
 using namespace NMisc;
-using namespace NPtr;
+using namespace NStorage;
 
 class CSQLiteQueryInstance;
 
@@ -51,7 +51,7 @@ class CSQLiteQueryResult : public CQueryResult
 
 public:
 
-	typedef NMib::NContainer::TCVariant<int64, fp64, CStr> CValue;
+	typedef NMib::NStorage::TCVariant<int64, fp64, CStr> CValue;
 
 	struct CRow
  	{
@@ -492,7 +492,7 @@ public:
 		DMibSafeCheck(!mp_pDB, "Must be deleted");
 	}
 
-	virtual bint f_Create(const NMib::NRegistry::CRegistry_CStr &_Parameters)
+	virtual bint f_Create(const NMib::NContainer::CRegistry_CStr &_Parameters)
 	{
 		DMibCheck(!mp_pDB);
 
