@@ -11,7 +11,7 @@ namespace NMib::NSQL
 	/*¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯*\
 	|	Class:				A Database exception									|
 	\*_____________________________________________________________________________*/
-	DMibImpErrorClass(CExceptionDatabase, NException::CException);
+	DMibImpErrorClassDefine(CExceptionDatabase, NException::CException);
 
 #	define DMibErrorDatabase(d_Description) DMibImpError(NMib::NSQL::CExceptionDatabase, d_Description)
 

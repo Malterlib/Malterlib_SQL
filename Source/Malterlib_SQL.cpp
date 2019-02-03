@@ -9,6 +9,8 @@ using namespace NMib::NStorage;
 
 namespace NMib::NSQL
 {
+	DMibImpErrorClassImplement(CExceptionDatabase);
+
 	CQuery::CQuery()
 	{
 	}
