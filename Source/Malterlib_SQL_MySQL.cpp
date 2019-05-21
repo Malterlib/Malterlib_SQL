@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 /***********************************************************************************
@@ -13,7 +13,7 @@ NOTE: Parameter binding (CQueryInstance::f_BindParameter) is NOT supported for M
 
 #ifdef DPlatformFamily_Windows
 	#include <windows.h>
-#endif 
+#endif
 
 #include <mysql.h>
 #include <errmsg.h>
@@ -146,7 +146,7 @@ class CMySqlQueryInstance : public CQueryInstance
 {
 public:
 	CMySqlQuery *m_pQuery;
-	CStr m_Error;	
+	CStr m_Error;
 
 	CMySqlQueryInstance()
 	{
@@ -163,7 +163,7 @@ public:
 
 
 	CQueryResult *f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp);
-	
+
 	virtual bint f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
 		DMibSafeCheck(false, "Parameter binding is NOT supported for MySql currently.");
@@ -192,7 +192,7 @@ public:
 	{
 		CMySqlQueryInstance *pQueryInst = DMibNew CMySqlQueryInstance;
 		pQueryInst->m_pQuery = this;
-		return pQueryInst;        
+		return pQueryInst;
 	}
 };
 
@@ -231,8 +231,8 @@ public:
 
 	MYSQL m_Conn;
 	MYSQL *m_pConn;
-	
-	virtual bint f_Create(const NMib::NContainer::CRegistry_CStr &_Parameters)
+
+	virtual bint f_Create(const NMib::NContainer::CRegistry &_Parameters)
 	{
         m_pConn = mysql_init(&m_Conn);
 		ms_MainThreadCleanup.m_bDoneInit = true;
@@ -282,7 +282,7 @@ public:
 	{
 		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + mysql_error(m_pConn);
 	}
-	
+
 
 	CQuery *f_CreateQuery(NStr::CStr _Query)
 	{
@@ -299,7 +299,7 @@ public:
 	{
 		CMySqlQueryInstance *pInstance = (CMySqlQueryInstance *)_pQuery;
 
-		return pInstance->f_Execute(this);		
+		return pInstance->f_Execute(this);
 	}
 
 	void f_CommitTransaction()

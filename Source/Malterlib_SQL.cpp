@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include "Malterlib_SQL.h"
@@ -194,7 +194,7 @@ namespace NMib::NSQL
 		//_pImp->f_CreateQuery()
 	}
 
-	bint CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry_CStr &_Parameters, mint _nWorkerThreads)
+	bint CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreads)
 	{
 		if (mp_pMainImp)
 		{

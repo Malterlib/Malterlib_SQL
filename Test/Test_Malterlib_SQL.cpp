@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include <Mib/SQL/SQL>
@@ -12,7 +12,7 @@ using NMib::fg_Explicit;
 void fg_Malterlib_SQL_MySql_MakeActive();
 void fg_Malterlib_SQL_SQLite_MakeActive();
 
-namespace 
+namespace
 {
 	class CDB_Tests : public NMib::NTest::CTest
 	{
@@ -24,7 +24,7 @@ namespace
 			EFlag_NoBinding		= DMibBit(0),
 			EFlag_MySqlSyntax	= DMibBit(1),
 		};
-		
+
 		void f_DoSQLConnectionTests(NMib::NSQL::CSQLConnection &_SQLConn, EFlag _Flags)
 		{
 			NMib::NSQL::CSQLConnection &SQLConn = _SQLConn;
@@ -166,16 +166,16 @@ namespace
 
 		void f_DoTests()
 		{
-			
+
 			///*
 			DMibTestSuite("SQLite")
 			{
 				fg_Malterlib_SQL_SQLite_MakeActive();
-				
+
 				NMib::NSQL::CSQLConnection SQLConn;
 
 				// Test create DB (in memory)
-				CRegistry_CStr Registry;
+				CRegistry Registry;
 				Registry.f_SetValue("Database", ":memory:");
 				DMibTest(DMibExpr(SQLConn.f_Create("NMib::NSQL::CDatabaseImplementation_SQLite", Registry, 1))) (ETest_FailAndStop);
 
@@ -191,7 +191,7 @@ namespace
 				NMib::NSQL::CSQLConnection SQLConn;
 
 				// Connect to local db.
-				CRegistry_CStr Registry;
+				CRegistry Registry;
 				Registry.f_SetValue("Host", "localhost");
 				Registry.f_SetValue("User", "root");
 				Registry.f_SetValue("Password", "asdasd");

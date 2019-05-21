@@ -1,9 +1,10 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #pragma once
 
 #include <Mib/Core/Core>
+#include <Mib/Container/Registry>
 
 namespace NMib::NSQL
 {
@@ -148,7 +149,7 @@ namespace NMib::NSQL
 	public:
 		virtual ~CDatabaseImplementation(){}
 
-		virtual bint f_Create(const NContainer::CRegistry_CStr &_Parameters) = 0;
+		virtual bint f_Create(const NContainer::CRegistry &_Parameters) = 0;
 		virtual void f_Destroy(bint _bDestroyTherad) = 0;
 		virtual CQuery *f_CreateQuery(NStr::CStr _Query) = 0;
 
@@ -221,14 +222,14 @@ namespace NMib::NSQL
 		DMibListLinkD_List(CWorkerThread, m_Link) mp_WorkingThreads;
 
 		NStr::CStr mp_Implementation;
-		NContainer::CRegistry_CStr mp_Parameters;
+		NContainer::CRegistry mp_Parameters;
 		NStorage::TCUniquePointer<CDatabaseImplementation> mp_pMainImp;
 	public:
 
 		CSQLConnection();
 		~CSQLConnection();
 
-		bint f_Create(const ch8 *_pImplementation, const NContainer::CRegistry_CStr &_Parameters, mint _nWorkerThreadss);
+		bint f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreadss);
 
 		void f_Close();
 

@@ -1,4 +1,4 @@
-// Copyright © 2015 Hansoft AB 
+// Copyright © 2015 Hansoft AB
 // Distributed under the MIT license, see license text in LICENSE.Malterlib
 
 #include <Mib/SQL/SQL>
@@ -7,7 +7,7 @@
 
 #ifdef DPlatformFamily_Windows
 	#include <windows.h>
-#endif 
+#endif
 
 #include "../../../SDK/SQLite/sqlite3.h"
 
@@ -100,7 +100,7 @@ public:
 		DMibRequire(m_Columns[_iCol].m_Type == EType_Int64);
 		return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<int64>();
 	}
-		
+
 	virtual fp64 f_GetFp64(int _iRow, int _iCol)
 	{
 		DMibRequire(m_Rows.f_IsPosValid(_iRow) && m_Columns.f_IsPosValid(_iCol));
@@ -111,7 +111,7 @@ public:
 		DMibRequire(m_Columns[_iCol].m_Type == EType_Fp64);
 		return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<fp64>();
 	}
-	
+
 	virtual bint f_IsNull(int _iRow, int _iCol)
 	{
 		DMibRequire(m_Rows.f_IsPosValid(_iRow) && m_Columns.f_IsPosValid(_iCol));
@@ -170,14 +170,14 @@ private:
 
 		int m_TypeID;
 		CStr m_StrValue;
-		union 
+		union
 		{
 			int32 m_Int32;
 			int64 m_Int64;
 			double m_DoubleVal;
 		} m_NumericValue;
 
-		CParam() 
+		CParam()
 			: m_ParamIndex(-1)
 			, m_TypeID(0)
 		{}
@@ -186,7 +186,7 @@ private:
 	TCVector<CParam> mp_Params;
 
 public:
-	
+
 	CSQLiteQueryInstance(CSQLiteQuery* _pQuery) : mp_pQuery(_pQuery)
 	{
 		int nParams = sqlite3_bind_parameter_count(mp_pQuery->mp_pStatement);
@@ -210,7 +210,7 @@ public:
 
 		sqlite3_clear_bindings(pStatement);
 		sqlite3_reset(pStatement);
-				
+
 		int nParams = mp_Params.f_GetLen();
 		for (int iP = 0; iP < nParams; ++iP)
 		{
@@ -248,7 +248,7 @@ public:
 
 			if (Ret != SQLITE_OK)
 			{
-				
+
 				DMibTrace("SQLite execution binding failed: \"\"\n", CStr(sqlite3_errmsg(_pSQLite)));
 				return nullptr;
 			}
@@ -287,7 +287,7 @@ public:
 
 		// TODO: Cache this per query where possible (Queries not requiring binding.)
 
-		auto FGetColumnType = [] (int _ColType) -> CQueryResult::EType 
+		auto FGetColumnType = [] (int _ColType) -> CQueryResult::EType
 		{
 			switch(_ColType)
 			{
@@ -328,7 +328,7 @@ public:
 			ColType = sqlite3_column_type(pStatement, iC);
 			pResults->m_Columns[iC].m_Type = FGetColumnType(ColType);
 		}
-				
+
 		pResults->m_nReturnedRows = 0;
 
 		while(Ret == SQLITE_ROW)
@@ -375,7 +375,7 @@ public:
 			++pResults->m_nReturnedRows;
 			Ret = sqlite3_step(pStatement);
 		}
-		
+
 		return pResults.f_Detach();
 	}
 
@@ -492,7 +492,7 @@ public:
 		DMibSafeCheck(!mp_pDB, "Must be deleted");
 	}
 
-	virtual bint f_Create(const NMib::NContainer::CRegistry_CStr &_Parameters)
+	virtual bint f_Create(const NMib::NContainer::CRegistry &_Parameters)
 	{
 		DMibCheck(!mp_pDB);
 
@@ -528,7 +528,7 @@ public:
 	{
 		return CFStr1024(_pError) + CFStr1024(" SQLite returned: ") + sqlite3_errmsg(mp_pDB);
 	}
-	
+
 	CQuery *f_CreateQuery(NStr::CStr _Query)
 	{
 //		DMibDTrace("Creating sqlite query: {}\n", _Query);
@@ -537,7 +537,7 @@ public:
 		CStr UTF8Query = _Query;
 
 		int Ret;
-		
+
 		while (SQLITE_BUSY == (Ret = sqlite3_prepare_v2(mp_pDB, UTF8Query.f_GetStr(), -1, &pStatement, nullptr)))
 		{
 			NSys::fg_Thread_Sleep(0);
@@ -564,7 +564,7 @@ public:
 	{
 		CSQLiteQueryInstance *pInstance = (CSQLiteQueryInstance *)_pQuery;
 
-		return pInstance->f_Execute(mp_pDB);		
+		return pInstance->f_Execute(mp_pDB);
 	}
 
 	void f_CommitTransaction()
