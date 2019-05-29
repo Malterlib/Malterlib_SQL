@@ -19,7 +19,7 @@ namespace NMib::NSQL
 	{
 	}
 
-	bint CQueryInstance::f_BindParameterNull(int _iParam)
+	bool CQueryInstance::f_BindParameterNull(int _iParam)
 	{
 		return f_BindParameter(_iParam, 0, 0);
 	}
@@ -194,7 +194,7 @@ namespace NMib::NSQL
 		//_pImp->f_CreateQuery()
 	}
 
-	bint CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreads)
+	bool CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreads)
 	{
 		if (mp_pMainImp)
 		{
@@ -319,7 +319,7 @@ namespace NMib::NSQL
 	}
 
 	// Async transactions
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bint _bAsync)
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync)
 	{
 		CWorkerThread *pThread = nullptr;
 		while (!pThread)
@@ -344,7 +344,7 @@ namespace NMib::NSQL
 		pThread->m_Event.f_Signal();
 	}
 
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bint _bAsync)
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bool _bAsync)
 	{
 		f_CommitTransaction(_pTransaction, _pHandler, _pEvent, CTransactionHandler::fs_HandleTransaction, _bAsync);
 	}
@@ -439,7 +439,7 @@ namespace NMib::NSQL
 		delete this;
 	}
 
-	void CTransaction::f_SetAllowFail(bint _bAllow)
+	void CTransaction::f_SetAllowFail(bool _bAllow)
 	{
 		m_bAllowFail = _bAllow;
 	}

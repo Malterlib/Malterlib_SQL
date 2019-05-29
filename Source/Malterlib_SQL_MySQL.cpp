@@ -96,7 +96,7 @@ public:
 		return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<fp64>();
 	}
 
-	virtual bint f_IsNull(int _iRow, int _iCol)
+	virtual bool f_IsNull(int _iRow, int _iCol)
 	{
 		return m_Columns[_iCol].m_Type == EType_NULL;
 	}
@@ -164,7 +164,7 @@ public:
 
 	CQueryResult *f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp);
 
-	virtual bint f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
+	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
 		DMibSafeCheck(false, "Parameter binding is NOT supported for MySql currently.");
 		return false;
@@ -211,7 +211,7 @@ public:
 	class CMainThreadCleanup
 	{
 	public:
-		bint m_bDoneInit;
+		bool m_bDoneInit;
 		CMainThreadCleanup()
 		{
 			m_bDoneInit = false;
@@ -232,7 +232,7 @@ public:
 	MYSQL m_Conn;
 	MYSQL *m_pConn;
 
-	virtual bint f_Create(const NMib::NContainer::CRegistry &_Parameters)
+	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters)
 	{
         m_pConn = mysql_init(&m_Conn);
 		ms_MainThreadCleanup.m_bDoneInit = true;
@@ -265,7 +265,7 @@ public:
 			return false;
 	}
 
-	virtual void f_Destroy(bint _bDestroyThread)
+	virtual void f_Destroy(bool _bDestroyThread)
 	{
 		if (m_pConn)
 		{

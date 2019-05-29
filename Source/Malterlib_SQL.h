@@ -29,8 +29,8 @@ namespace NMib::NSQL
 	//	virtual int64 f_GetInt64(int _iCol) = 0;
 	//	virtual fp64 f_GetFp64(int _iCol) = 0;
 	//
-	//	virtual bint f_Next() = 0;
-	//	virtual bint f_OK() = 0;
+	//	virtual bool f_Next() = 0;
+	//	virtual bool f_OK() = 0;
 	//};
 
 
@@ -58,7 +58,7 @@ namespace NMib::NSQL
 		virtual NMib::NStr::CStr f_GetString(int _iRow, int _iCol) = 0;
 		virtual int64 f_GetInt64(int _iRow, int _iCol) = 0;
 		virtual fp64 f_GetFp64(int _iRow, int _iCol) = 0;
-		virtual bint f_IsNull(int _iRow, int _iCol) = 0;
+		virtual bool f_IsNull(int _iRow, int _iCol) = 0;
 
 		virtual NMib::NContainer::TCVector<CCol> const &f_GetFields() = 0;
 		virtual EType f_GetFieldType(int _iCol) = 0;
@@ -96,15 +96,15 @@ namespace NMib::NSQL
 		{
 		}
 
-		virtual bint f_BindParameter(int _iParam, int _TypeID, void const*_pParam) = 0;
+		virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam) = 0;
 
 		template <typename tf_CType>
-		bint f_BindParameter(int _iParam, tf_CType const& _Data)
+		bool f_BindParameter(int _iParam, tf_CType const& _Data)
 		{
 			return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::ETypeID, &_Data);
 		}
 
-		bint f_BindParameterNull(int _iParam);
+		bool f_BindParameterNull(int _iParam);
 
 		virtual void f_Delete() = 0;
 	};
@@ -132,14 +132,14 @@ namespace NMib::NSQL
 		DMibListLinkD_List(CQueryLink, m_Link) m_Transactions;
 		typedef DMibListLinkD_Iter(CQueryLink, m_Link) CQueryIter;
 		int m_nTransactions;
-		bint m_bAllowFail;
+		bool m_bAllowFail;
 		NContainer::TCVector< NStorage::TCUniquePointer<CQuery> > m_OwnedQueries;
 
 		~CTransaction();
 		CTransaction();
 		CQueryInstance *f_AddQuery(CQuery *_pQuery);
 		void f_Delete();
-		void f_SetAllowFail(bint _bAllow);
+		void f_SetAllowFail(bool _bAllow);
 	};
 
 	typedef void (PFTransactionResultCallback)(CTransactionResult *_pResult, void *_pContext);
@@ -149,8 +149,8 @@ namespace NMib::NSQL
 	public:
 		virtual ~CDatabaseImplementation(){}
 
-		virtual bint f_Create(const NContainer::CRegistry &_Parameters) = 0;
-		virtual void f_Destroy(bint _bDestroyTherad) = 0;
+		virtual bool f_Create(const NContainer::CRegistry &_Parameters) = 0;
+		virtual void f_Destroy(bool _bDestroyTherad) = 0;
 		virtual CQuery *f_CreateQuery(NStr::CStr _Query) = 0;
 
 		virtual void f_BeginTransaction() = 0;
@@ -183,7 +183,7 @@ namespace NMib::NSQL
 			void *m_pContext;
 			NThread::CSemaphoreReportableAggregate *m_pEvent;
 			PFTransactionResultCallback *m_fCallback;
-			bint m_bAsync;
+			bool m_bAsync;
 
 			CTransactionResult *m_pResult;
 
@@ -229,7 +229,7 @@ namespace NMib::NSQL
 		CSQLConnection();
 		~CSQLConnection();
 
-		bint f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreadss);
+		bool f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreadss);
 
 		void f_Close();
 
@@ -244,9 +244,9 @@ namespace NMib::NSQL
 
 		CTransactionResult *f_CommitTransaction(CTransaction *_pTransaction); // Blocks
 		// Async transactions
-		void f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bint _bAsync);
+		void f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync);
 
-		void f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bint _bAsync);
+		void f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bool _bAsync);
 
 
 		void f_ProcessTansactions();

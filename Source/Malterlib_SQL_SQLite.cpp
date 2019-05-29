@@ -112,7 +112,7 @@ public:
 		return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<fp64>();
 	}
 
-	virtual bint f_IsNull(int _iRow, int _iCol)
+	virtual bool f_IsNull(int _iRow, int _iCol)
 	{
 		DMibRequire(m_Rows.f_IsPosValid(_iRow) && m_Columns.f_IsPosValid(_iCol));
 
@@ -380,7 +380,7 @@ public:
 	}
 
 
-	virtual bint f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
+	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
 		if (!mp_Params.f_IsPosValid(_iParam))
 			return false;
@@ -492,7 +492,7 @@ public:
 		DMibSafeCheck(!mp_pDB, "Must be deleted");
 	}
 
-	virtual bint f_Create(const NMib::NContainer::CRegistry &_Parameters)
+	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters)
 	{
 		DMibCheck(!mp_pDB);
 
@@ -512,7 +512,7 @@ public:
 		return true;
 	}
 
-	virtual void f_Destroy(bint _bDestroyThread)
+	virtual void f_Destroy(bool _bDestroyThread)
 	{
 		if (mp_pDB)
 		{
