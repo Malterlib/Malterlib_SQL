@@ -81,7 +81,7 @@ namespace
 				TCUniquePointer<NMib::NSQL::CQueryInstance> pQInst = fg_Explicit(SQLConn.f_CreateQueryInstance(pParamQuery.f_Get()));
 				DMibTest(DMibExpr(pQInst)) (ETest_FailAndStop);
 
-				DMibTest(DMibExpr(pQInst->f_BindParameter<int32>(0, 75)) > DMibExpr(0)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pQInst->f_BindParameter<int32>(0, 75)) == DMibExpr(true)) (ETest_FailAndStop);
 
 				pResults =	fg_Explicit(SQLConn.f_ExecuteQuery(pQInst.f_Get()));
 				DMibTest(DMibExpr(!pResults.f_IsEmpty())) (ETest_FailAndStop);
