@@ -112,6 +112,10 @@ Property
 		{
 			!!PlatformFamily Linux
 		}
+		ExtraCompilerFlags "/wd4996 @(Compile.ExtraCompilerFlags)"
+		{
+			!!PlatformFamily "Windows"
+		}
 	}
 	%Group SQL_SQLite
 	{
@@ -119,6 +123,12 @@ Property
 		Property
 		{
 			ScriptFile "@('Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh'->MakeAbsolute())"
+			ScriptFileTranslated "@(ScriptFile)"
+			ScriptFileTranslated "@(ScriptFileTranslated->ParseFormatString('{}:{}','/{0,cl}{1}'))"
+			{
+				!!PlatformFamily Windows // For MinGW
+			}
+
 			OutputDirectory "@('SourceGenerated/SQLite'->MakeAbsolute())"
 			SQLiteSources "@('../../External/sqlite'->MakeAbsolute())"
 			TempDir "@(GeneratedDirectory)sqlite/Build"
@@ -156,16 +166,23 @@ Property
 		{
 			%GenerateFile "SQLiteAmalgation"
 			{
+				!PlatformFamily Windows
+
 				Property
 				{
 					ThisFileName "@(this.Identity->GetFile())"
 					SourceDependencies "@(SQLiteSources->FindDirectoriesRecursiveIn('*', '*/.git', '*/test', '*/*.test'))"
+					BashExecutable "git"
+					BashExecutable "C:/Program Files/Git/bin/bash.exe"
+					{
+						!!PlatformFamily Windows
+					}
 
 					Name "@(GeneratedDirectory)sqlite/SQLiteAmalgation.txt"
 					Contents	"@(ExecuteCommand("\
 								"'@(GeneratedDirectory)sqlite/@(ThisFileName).state'"\
 								", '@(SQLiteSources);@(SourceDependencies);@(SQLiteSources)/src;@(ScriptFile)'"\
-								", 'bash'"\
+								", '@(BashExecutable)'"\
 								", '-C'"\
 								", '@(ScriptFile)'"\
 								", '@(SQLiteSources)'"\
