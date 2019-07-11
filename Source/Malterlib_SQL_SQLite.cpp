@@ -9,7 +9,7 @@
 	#include <windows.h>
 #endif
 
-#include "../../../SDK/SQLite/sqlite3.h"
+#include "../SourceGenerated/SQLite/sqlite3.h"
 
 using namespace NMib;
 using namespace NSQL;

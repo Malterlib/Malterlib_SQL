@@ -3,6 +3,15 @@
 
 Import "../Core/Lib_Malterlib.MTarget"
 
+%Repository "sqlite"
+{
+	Repository
+	{
+		Type External
+		Remotes "upstream=https://github.com/sqlite/sqlite.git;@(Repository.Remotes)"
+	}
+}
+
 %Group "{Malterlib}/{Lib_Malterlib_SQL}"
 {
 	%Group SQL
@@ -99,19 +108,74 @@ Property
 	{
 		!!CompileDialect C
 	}
-
-	%Group SDK
-	{
-		%Group SQLite
-		{
-			%File ../../SDK/SQLite/sqlite3.c
-			%File ../../SDK/SQLite/sqlite3.h
-			%File ../../SDK/SQLite/sqlite3ext.h
-		}
-	}
 	%Group SQL_SQLite
 	{
 		%File "Source/Malterlib_SQL_SQLite.cpp"
+		Property
+		{
+			ScriptFile "@('Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh'->MakeAbsolute())"
+			OutputDirectory "@('SourceGenerated/SQLite'->MakeAbsolute())"
+			SQLiteSources "@('../../External/sqlite'->MakeAbsolute())"
+			TempDir "@(GeneratedDirectory)sqlite/Build"
+		}
+		%Group Source
+		{
+			Compile.Disabled true
+			%Group src
+			{
+				%File "@(SQLiteSources)/src/^*.c"
+				%File "@(SQLiteSources)/src/^*.h"
+			}
+			%Group ext
+			{
+				%File "@(SQLiteSources)/ext/^*.c"
+				%File "@(SQLiteSources)/ext/^*.h"
+			}
+		}
+		%Group SourceGenerated
+		{
+			%File "@(OutputDirectory)/sqlite3.c"
+			{
+				Compile.AllowNonExisting true
+			}
+			%File "@(OutputDirectory)/sqlite3.h"
+			{
+				Compile.AllowNonExisting true
+			}
+			%File "@(OutputDirectory)/sqlite3ext.h"
+			{
+				Compile.AllowNonExisting true
+			}
+		}
+		%Group Generated
+		{
+			%GenerateFile "SQLiteAmalgation"
+			{
+				Property
+				{
+					ThisFileName "@(this.Identity->GetFile())"
+					SourceDependencies "@(SQLiteSources->FindDirectoriesRecursiveIn('*', '*/.git', '*/test', '*/*.test'))"
+
+					Name "@(GeneratedDirectory)sqlite/SQLiteAmalgation.txt"
+					Contents	"@(ExecuteCommand("\
+								"'@(GeneratedDirectory)sqlite/@(ThisFileName).state'"\
+								", '@(SQLiteSources);@(SourceDependencies);@(SQLiteSources)/src;@(ScriptFile)'"\
+								", 'bash'"\
+								", '-C'"\
+								", '@(ScriptFile)'"\
+								", '@(SQLiteSources)'"\
+								", '@(OutputDirectory)'"\
+								", '@(TempDir)'"\
+								", '@(BuildSystemBasePath)'"\
+								", '@(Builtin.MToolExe)'"\
+								"))"
+				}
+			}
+		}
+		%Group Tools
+		{
+			%File "Tools/Malterlib_SQL_SQLite*"
+		}
 	}
 }
 
