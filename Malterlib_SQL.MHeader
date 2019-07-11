@@ -172,7 +172,7 @@ Property
 				{
 					ThisFileName "@(this.Identity->GetFile())"
 					SourceDependencies "@(SQLiteSources->FindDirectoriesRecursiveIn('*', '*/.git', '*/test', '*/*.test'))"
-					BashExecutable "git"
+					BashExecutable "bash"
 					BashExecutable "C:/Program Files/Git/bin/bash.exe"
 					{
 						!!PlatformFamily Windows
