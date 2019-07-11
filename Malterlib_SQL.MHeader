@@ -166,7 +166,11 @@ Property
 		{
 			%GenerateFile "SQLiteAmalgation"
 			{
-				!PlatformFamily Windows
+				&
+				{
+					!PlatformFamily Windows
+					!MalterlibBuildServerBuild true
+				}
 
 				Property
 				{
