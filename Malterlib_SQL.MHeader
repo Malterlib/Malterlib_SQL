@@ -104,9 +104,14 @@ Property
 // SQLite
 %Group "{Malterlib}/{Lib_Malterlib_SQL_SQLite}"
 {
-	Compile.PreprocessorDefines "SQLITE_HAVE_ISNAN;@(Compile.PreprocessorDefines)"
+	Compile
 	{
 		!!CompileDialect C
+		PreprocessorDefines "SQLITE_HAVE_ISNAN;@(Compile.PreprocessorDefines)"
+		PreprocessorDefines "HAVE_MREMAP=0;@(Compile.PreprocessorDefines)"
+		{
+			!!PlatformFamily Linux
+		}
 	}
 	%Group SQL_SQLite
 	{
