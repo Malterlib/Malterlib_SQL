@@ -458,6 +458,9 @@ CQueryResult *CMySqlQueryInstance::f_Execute(NMib::NSQL::CDatabaseImplementation
 					case NMib::NSQL::CQueryResult::EType_CStr:
 						pResult->m_Rows[iRow].m_Data[i] = CStr(ppRow[i]);
 						break;
+					case NMib::NSQL::CQueryResult::EType_NULL:
+						DMibNeverGetHere;
+						break;
 					}
 				}
 			}
