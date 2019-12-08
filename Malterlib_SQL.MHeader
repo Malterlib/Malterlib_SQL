@@ -7,16 +7,16 @@ Import "../Core/Lib_Malterlib.MTarget"
 {
 	Repository
 	{
-		Type External
+		Type "External"
 		Remotes "upstream=https://github.com/sqlite/sqlite.git;@(Repository.Remotes)"
 	}
 }
 
 %Group "{Malterlib}/{Lib_Malterlib_SQL}"
 {
-	%Group SQL
+	%Group "SQL"
 	{
-		%Group Include
+		%Group "Include"
 		{
 			Compile.Type "C++"
 			{
@@ -25,7 +25,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 			%File "Include/Mib/SQL/^*"
 		}
 		%File "Source/Malterlib_SQL.*"
-		%Group Documentation
+		%Group "Documentation"
 		{
 			%File "Documentation/*"
 		}
@@ -66,7 +66,7 @@ Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
 		!!CompileDialect "C"
 		SearchPath "@('../../SDK/mariadb-connector/include'->MakeAbsolute());@(Compile.SearchPath)"
 	}
-	%Group SQL_MySql
+	%Group "SQL_MySql"
 	{
 		%File "Source/Malterlib_SQL_MySQL.cpp"
 	}
@@ -106,18 +106,18 @@ Property
 {
 	Compile
 	{
-		!!CompileDialect C
+		!!CompileDialect "C"
 		PreprocessorDefines "SQLITE_HAVE_ISNAN;@(Compile.PreprocessorDefines)"
 		PreprocessorDefines "HAVE_MREMAP=0;@(Compile.PreprocessorDefines)"
 		{
-			!!PlatformFamily Linux
+			!!PlatformFamily "Linux"
 		}
 		ExtraCompilerFlags "/wd4996 @(Compile.ExtraCompilerFlags)"
 		{
 			!!PlatformFamily "Windows"
 		}
 	}
-	%Group SQL_SQLite
+	%Group "SQL_SQLite"
 	{
 		%File "Source/Malterlib_SQL_SQLite.cpp"
 		Property
@@ -126,28 +126,28 @@ Property
 			ScriptFileTranslated "@(ScriptFile)"
 			ScriptFileTranslated "@(ScriptFileTranslated->ParseFormatString('{}:{}','/{0,cl}{1}'))"
 			{
-				!!PlatformFamily Windows // For MinGW
+				!!PlatformFamily "Windows" // For MinGW
 			}
 
 			OutputDirectory "@('SourceGenerated/SQLite'->MakeAbsolute())"
 			SQLiteSources "@('../../External/sqlite'->MakeAbsolute())"
 			TempDir "@(GeneratedDirectory)sqlite/Build"
 		}
-		%Group Source
+		%Group "Source"
 		{
 			Compile.Disabled true
-			%Group src
+			%Group "src"
 			{
 				%File "@(SQLiteSources)/src/^*.c"
 				%File "@(SQLiteSources)/src/^*.h"
 			}
-			%Group ext
+			%Group "ext"
 			{
 				%File "@(SQLiteSources)/ext/^*.c"
 				%File "@(SQLiteSources)/ext/^*.h"
 			}
 		}
-		%Group SourceGenerated
+		%Group "Source"Generated
 		{
 			%File "@(OutputDirectory)/sqlite3.c"
 			{
@@ -162,13 +162,13 @@ Property
 				Compile.AllowNonExisting true
 			}
 		}
-		%Group Generated
+		%Group "Generated"
 		{
 			%GenerateFile "SQLiteAmalgation"
 			{
 				&
 				{
-					!PlatformFamily Windows
+					!PlatformFamily "Windows"
 					!MalterlibBuildServerBuild true
 				}
 
@@ -179,7 +179,7 @@ Property
 					BashExecutable "bash"
 					BashExecutable "C:/Program Files/Git/bin/bash.exe"
 					{
-						!!PlatformFamily Windows
+						!!PlatformFamily "Windows"
 					}
 
 					Name "@(GeneratedDirectory)sqlite/SQLiteAmalgation.txt"
@@ -198,7 +198,7 @@ Property
 				}
 			}
 		}
-		%Group Tools
+		%Group "Tools"
 		{
 			%File "Tools/Malterlib_SQL_SQLite*"
 		}
@@ -226,8 +226,8 @@ Property
 %Group "{Test}/{Malterlib_SQL}"
 {
 	Property.MalterlibLinkWithOpenSSL true
-	%Dependency Lib_Malterlib_SQL_MySQL
-	%Dependency Lib_Malterlib_SQL_SQLite
+	%Dependency "Lib_Malterlib_SQL_MySQL"
+	%Dependency "Lib_Malterlib_SQL_SQLite"
 }
 
 Property
