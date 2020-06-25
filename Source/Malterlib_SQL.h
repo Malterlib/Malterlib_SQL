@@ -212,7 +212,7 @@ namespace NMib::NSQL
 			CSQLConnection *m_pSQLConnection;
 			NThread::CEventAutoResetReportable m_Event;
 			DMibListLinkD_Link(CWorkerThread, m_Link);
-			CTask *m_pTask;
+			CTask *m_pTask = nullptr;
 		};
 
 		NThread::CMutual mp_ThreadsLock;

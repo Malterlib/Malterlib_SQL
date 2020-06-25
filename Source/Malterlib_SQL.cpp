@@ -123,7 +123,6 @@ namespace NMib::NSQL
 	{
 		m_pSQLConnection = _pSQL;
 		f_Start();
-		m_pTask = nullptr;
 	}
 
 	CSQLConnection::CWorkerThread::~CWorkerThread()
@@ -144,8 +143,7 @@ namespace NMib::NSQL
 				{
 					if (m_pTask)
 					{
-						m_pTask->f_Run(pImp.f_Get());
-						m_pTask = nullptr;
+						fg_Exchange(m_pTask, nullptr)->f_Run(pImp.f_Get());
 						{
 							DMibLock(m_pSQLConnection->mp_ThreadsLock);
 							m_pSQLConnection->mp_FreeThreads.f_Insert(this);
