@@ -181,7 +181,7 @@ namespace NMib::NSQL
 			CSQLConnection *m_pSQL;
 			CTransaction *m_pTransaction;
 			void *m_pContext;
-			NThread::CSemaphoreReportableAggregate *m_pEvent;
+			NThread::CSemaphoreAggregate *m_pEvent;
 			PFTransactionResultCallback *m_fCallback;
 			bool m_bAsync;
 
@@ -210,7 +210,6 @@ namespace NMib::NSQL
 			aint f_Main() override;
 
 			CSQLConnection *m_pSQLConnection;
-			NThread::CEventAutoResetReportable m_Event;
 			DMibListLinkD_Link(CWorkerThread, m_Link);
 			CTask *m_pTask = nullptr;
 		};
@@ -244,9 +243,9 @@ namespace NMib::NSQL
 
 		CTransactionResult *f_CommitTransaction(CTransaction *_pTransaction); // Blocks
 		// Async transactions
-		void f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync);
+		void f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync);
 
-		void f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bool _bAsync);
+		void f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreAggregate *_pEvent, bool _bAsync);
 
 
 		void f_ProcessTansactions();

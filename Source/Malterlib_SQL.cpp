@@ -132,7 +132,6 @@ namespace NMib::NSQL
 
 	aint CSQLConnection::CWorkerThread::f_Main()
 	{
-		m_EventWantQuit.f_ReportTo(&m_Event);
 		auto pImp = NMib::fg_CreateRuntimeType<CDatabaseImplementation>(m_pSQLConnection->mp_Implementation);
 
 		if (pImp)
@@ -150,7 +149,7 @@ namespace NMib::NSQL
 							m_pSQLConnection->mp_ThreadEvent.f_Signal();
 						}
 					}
-					m_Event.f_Wait();
+					m_EventWantQuit.f_Wait();
 				}
 			}
 
@@ -317,7 +316,7 @@ namespace NMib::NSQL
 	}
 
 	// Async transactions
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync)
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync)
 	{
 		CWorkerThread *pThread = nullptr;
 		while (!pThread)
@@ -339,10 +338,10 @@ namespace NMib::NSQL
 		pTask->m_fCallback = _fCallback;
 		pTask->m_bAsync = _bAsync;
 		pThread->m_pTask = pTask;
-		pThread->m_Event.f_Signal();
+		pThread->m_EventWantQuit.f_Signal();
 	}
 
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreReportableAggregate *_pEvent, bool _bAsync)
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreAggregate *_pEvent, bool _bAsync)
 	{
 		f_CommitTransaction(_pTransaction, _pHandler, _pEvent, CTransactionHandler::fs_HandleTransaction, _bAsync);
 	}
@@ -450,7 +449,7 @@ namespace NMib::NSQL
 	CQueryInstance *CSQLConnection::f_CreateQueryInstance(CQuery *_pQuery);
 
 	// Async transactions
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreReportableAggregate *_pEvent, PFTransactionResultCallback *_fCallback);
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, PFTransactionResultCallback *_fCallback);
 	CTransactionResult *CSQLConnection::f_GetTransacitonResult(void * &_pContext);
 */
 }
