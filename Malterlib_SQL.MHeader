@@ -8,14 +8,14 @@ Import "../Core/Lib_Malterlib.MTarget"
 	Repository
 	{
 		Type "External"
-		Remotes "upstream=https://github.com/sqlite/sqlite.git;@(Repository.Remotes)"
+		Remotes [{Name: "upstream", URL: "https://github.com/sqlite/sqlite.git"}]
 	}
 }
 
 %Group "{Malterlib}/{Lib_Malterlib_SQL}"
 {
 	%Group "SQL"
-	{
+	{	
 		%Group "Include"
 		{
 			Compile.Type "C++"
@@ -35,21 +35,14 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 Property
 {
-	MalterlibLibrary_SQL true
-	{
-		&
-		{
-			MalterlibLibrary_SQL ""
-			MalterlibLibrary_All true
-		}
-	}
-	MalterlibSubLibraries "SQL;@(MalterlibSubLibraries)"
+	MalterlibLibrary_SQL define bool = MalterlibLibrary_All
+	MalterlibSubLibraries =+ "SQL"
 	{
 		!!MalterlibLibrary_SQL true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL true
-//	MalterlibSubLibrarySeparate_Lib_Malterlib_SQL true
-	MalterlibIncludeRoots "@('Include'->MakeAbsolute());@(MalterlibIncludeRoots)"
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL define bool = true
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_SQL define bool = true
+	MalterlibIncludeRoots =+ "Include"->MakeAbsolute()
 	{
 		!!MalterlibLibrary_SQL true
 	}
@@ -64,7 +57,7 @@ Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
 	Compile
 	{
 		!!CompileDialect "C"
-		SearchPath "@('../../SDK/mariadb-connector/include'->MakeAbsolute());@(Compile.SearchPath)"
+		SearchPath += "../../SDK/mariadb-connector/include"->MakeAbsolute()
 	}
 	%Group "SQL_MySql"
 	{
@@ -82,22 +75,14 @@ Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
 	}
 }
 
-
 Property
 {
-	MalterlibLibrary_SQL_MySQL true
-	{
-		&
-		{
-			MalterlibLibrary_SQL_MySQL ""
-			MalterlibLibrary_All true
-		}
-	}
-	MalterlibSubLibraries "SQL_MySQL;@(MalterlibSubLibraries)"
+	MalterlibLibrary_SQL_MySQL define bool = MalterlibLibrary_All
+	MalterlibSubLibraries =+ "SQL_MySQL"
 	{
 		!!MalterlibLibrary_SQL_MySQL true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL_MySQL true
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_MySQL define bool = true
 }
 
 ///////////
@@ -107,12 +92,12 @@ Property
 	Compile
 	{
 		!!CompileDialect "C"
-		PreprocessorDefines "SQLITE_HAVE_ISNAN;@(Compile.PreprocessorDefines)"
-		PreprocessorDefines "HAVE_MREMAP=0;@(Compile.PreprocessorDefines)"
+		PreprocessorDefines += "SQLITE_HAVE_ISNAN"
+		PreprocessorDefines += "HAVE_MREMAP=0"
 		{
 			!!PlatformFamily "Linux"
 		}
-		ExtraCompilerFlags "/wd4996 @(Compile.ExtraCompilerFlags)"
+		ExtraCompilerFlags =+ "/wd4996"
 		{
 			!!PlatformFamily "Windows"
 		}
@@ -122,42 +107,42 @@ Property
 		%File "Source/Malterlib_SQL_SQLite.cpp"
 		Property
 		{
-			ScriptFile "@('Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh'->MakeAbsolute())"
-			ScriptFileTranslated "@(ScriptFile)"
-			ScriptFileTranslated "@(ScriptFileTranslated->ParseFormatString('{}:{}','/{0,cl}{1}'))"
+			ScriptFile define string = "Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh"->MakeAbsolute()
+			ScriptFileTranslated define string = ScriptFile
+			ScriptFileTranslated ScriptFileTranslated->ParseFormatString("{}:{}","/{0,cl}{1}")
 			{
 				!!PlatformFamily "Windows" // For MinGW
 			}
 
-			OutputDirectory "@('SourceGenerated/SQLite'->MakeAbsolute())"
-			SQLiteSources "@('../../External/sqlite'->MakeAbsolute())"
-			TempDir "@(GeneratedDirectory)sqlite/Build"
+			OutputDirectory define string = "SourceGenerated/SQLite"->MakeAbsolute()
+			SQLiteSources define string = "../../External/sqlite"->MakeAbsolute()
+			TempDir define string = `@(GeneratedDirectory)sqlite/Build`
 		}
 		%Group "Source"
 		{
 			Compile.Disabled true
 			%Group "src"
 			{
-				%File "@(SQLiteSources)/src/^*.c"
-				%File "@(SQLiteSources)/src/^*.h"
+				%File `@(SQLiteSources)/src/^*.c`
+				%File `@(SQLiteSources)/src/^*.h`
 			}
 			%Group "ext"
 			{
-				%File "@(SQLiteSources)/ext/^*.c"
-				%File "@(SQLiteSources)/ext/^*.h"
+				%File `@(SQLiteSources)/ext/^*.c`
+				%File `@(SQLiteSources)/ext/^*.h`
 			}
 		}
-		%Group "Source"Generated
+		%Group "SourceGenerated"
 		{
-			%File "@(OutputDirectory)/sqlite3.c"
+			%File `@(OutputDirectory)/sqlite3.c`
 			{
 				Compile.AllowNonExisting true
 			}
-			%File "@(OutputDirectory)/sqlite3.h"
+			%File `@(OutputDirectory)/sqlite3.h`
 			{
 				Compile.AllowNonExisting true
 			}
-			%File "@(OutputDirectory)/sqlite3ext.h"
+			%File `@(OutputDirectory)/sqlite3ext.h`
 			{
 				Compile.AllowNonExisting true
 			}
@@ -174,27 +159,29 @@ Property
 
 				Property
 				{
-					ThisFileName "@(this.Identity->GetFile())"
-					SourceDependencies "@(SQLiteSources->FindDirectoriesRecursiveIn('*', '*/.git', '*/test', '*/*.test'))"
-					BashExecutable "bash"
+					ThisFileName define string = this.Identity->GetFile()
+					SourceDependencies define [string] = SQLiteSources->FindDirectoriesRecursiveIn("*", ["*/.git", "*/test", "*/*.test"])
+					BashExecutable define string = "bash"
 					BashExecutable "C:/Program Files/Git/bin/bash.exe"
 					{
 						!!PlatformFamily "Windows"
 					}
-
-					Name "@(GeneratedDirectory)sqlite/SQLiteAmalgation.txt"
-					Contents	"@(ExecuteCommand("\
-								"'@(GeneratedDirectory)sqlite/@(ThisFileName).state'"\
-								", '@(SQLiteSources);@(SourceDependencies);@(SQLiteSources)/src;@(ScriptFile)'"\
-								", '@(BashExecutable)'"\
-								", '-C'"\
-								", '@(ScriptFile)'"\
-								", '@(SQLiteSources)'"\
-								", '@(OutputDirectory)'"\
-								", '@(TempDir)'"\
-								", '@(BuildSystemBasePath)'"\
-								", '@(Builtin.MToolExe)'"\
-								"))"
+				}
+				GenerateFile
+				{
+					Name `@(GeneratedDirectory)sqlite/SQLiteAmalgation.txt`
+					Contents ExecuteCommand(
+						`@(GeneratedDirectory)sqlite/@(ThisFileName).state`
+						, [SQLiteSources, SourceDependencies..., `@(SQLiteSources)/src`, ScriptFile]
+						, BashExecutable
+						, "-C"
+						, ScriptFile
+						, SQLiteSources
+						, OutputDirectory
+						, TempDir
+						, BuildSystemBasePath
+						, Builtin.MToolExe
+					)
 				}
 			}
 		}
@@ -208,24 +195,18 @@ Property
 
 Property
 {
-	MalterlibLibrary_SQL_SQLite true
-	{
-		&
-		{
-			MalterlibLibrary_SQL_SQLite ""
-			MalterlibLibrary_All true
-		}
-	}
-	MalterlibSubLibraries "SQL_SQLite;@(MalterlibSubLibraries)"
+	MalterlibLibrary_SQL_SQLite define bool = MalterlibLibrary_All
+	MalterlibSubLibraries =+ "SQL_SQLite"
 	{
 		!!MalterlibLibrary_SQL_SQLite true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL_SQLite true
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_SQLite define bool = true
 }
 
 %Group "{Test}/{Malterlib_SQL}"
 {
-	Property.MalterlibLinkWithOpenSSL true
+	Property.MalterlibLinkWithBoringSSL true
+
 	%Dependency "Lib_Malterlib_SQL_MySQL"
 	%Dependency "Lib_Malterlib_SQL_SQLite"
 }
@@ -234,9 +215,8 @@ Property
 {
 	!!MalterlibEnableInternalTests true
 	
-	MalterlibTests "Malterlib_SQL;@(MalterlibTests)"
-	MalterlibTestFiles_Malterlib_SQL "@('Test/*'->MakeAbsolute())"
-	MalterlibTestDependencies_Malterlib_SQL "Lib_Malterlib_SQL"
-	MalterlibTestExtraGroups_Malterlib_SQL "{Test}/{Malterlib_SQL}"
+	MalterlibTests =+ "Malterlib_SQL"
+	MalterlibTestFiles_Malterlib_SQL define [type(CEntity)] = ["Test/*"->MakeAbsolute()]
+	MalterlibTestDependencies_Malterlib_SQL define [type(CEntity)] = ["Lib_Malterlib_SQL"]
+	MalterlibTestExtraGroups_Malterlib_SQL define [string] = ["{Test}/{Malterlib_SQL}"]
 }
-
