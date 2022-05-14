@@ -12,6 +12,90 @@ Import "../Core/Lib_Malterlib.MTarget"
 	}
 }
 
+%Repository "mariadb-connector-c"
+{
+	Repository
+	{
+		Type "External"
+		Remotes [{Name: "upstream", URL: "https://github.com/mariadb-corporation/mariadb-connector-c.git"}]
+	}
+}
+
+%Import "../../External/mariadb-connector-c/CMakeLists.txt"
+{
+	Import.CMake_Variables =+ [
+		"WITH_UNIT_TESTS=OFF"
+		, "WITH_EXTERNAL_ZLIB=ON"
+		, "CLIENT_PLUGIN_DIALOG=OFF"
+		, "CLIENT_PLUGIN_CLEARTEXT=OFF"
+		, "CLIENT_PLUGIN_AUTH_GSSAPI=OFF"
+		, "CLIENT_PLUGIN_SHA256_PASSWORD=STATIC"
+		, "CLIENT_PLUGIN_CLIENT_ED25519=STATIC"
+		, "CLIENT_PLUGIN_CACHING_SHA2_PASSWORD=STATIC"
+		, "CLIENT_PLUGIN_MYSQL_CLEAR_PASSWORD=OFF"
+		, "CLIENT_PLUGIN_MYSQL_OLD_PASSWORD=OFF"
+	]
+
+	Import.CMake_Variables =+ `ZLIB_INCLUDE_DIR=@("../../External/zlib"->MakeAbsolute())`
+	Import.CMake_Variables =+ `ZSTD_INCLUDE_DIRS=@("../../External/zstd/lib"->MakeAbsolute())`
+	Import.CMake_Variables =+ `ZLIB_LIBRARY=/dev/null"->MakeAbsolute())`
+
+	Import.CMake_Variables =+ "CMAKE_BUILD_WITH_INSTALL_RPATH=ON"
+	{
+		&
+		{
+			PlatformFamily "Linux"
+			!HostPlatformFamily "Linux"
+		}
+	}
+
+	Target.CharacterSet "MultiByte"
+	{
+		!!PlatformFamily "Windows"
+	}
+
+	Compile
+	{
+		!!CompileDialect "C"
+
+		PrefixHeader undefined
+
+		Warnings "Minimal"
+		{
+			!!GeneratorFamily "VisualStudio"
+		}
+
+		Warnings_DeprecatedDeclarations false
+		{
+			!!GeneratorFamily "Xcode"
+		}
+
+		PreprocessorDefines += ["LIBMARIADB", "HAVE_COMPRESS", "THREAD"]
+
+		PreprocessorDefines += ["_XOPEN_SOURCE=700", "_DARWIN_C_SOURCE"]
+		{
+			&
+			{
+				PlatformFamily "OSX"
+				|
+				{
+					Compile.CLanguage "C99"
+					Compile.CLanguage "C11"
+					Compile.CLanguage "GNU99"
+					Compile.CLanguage "C89"
+					Compile.CLanguage "GNU89"
+					Compile.CLanguage "GNU11"
+				}
+			}
+		}
+	}
+}
+
+Property
+{
+	MariaDBClientIncludePath define string = GetProperty("Import", "CMake_CacheDirectory", "Group:External.Group:mariadb-connector-c.Target:Lib_mariadb-connector-c_mariadbclient.Import:*") / "include"
+}
+
 %Group "{Malterlib}/{Lib_Malterlib_SQL}"
 {
 	%Group "SQL"
@@ -48,8 +132,6 @@ Property
 	}
 }
 
-Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
-
 ///////////
 // MySQL
 %Group "{Malterlib}/{Lib_Malterlib_SQL_MySQL}"
@@ -57,13 +139,14 @@ Import "../../SDK/mariadb-connector/mariadb-connector.MTarget"
 	Compile
 	{
 		!!CompileDialect "C"
-		SearchPath += "../../SDK/mariadb-connector/include"->MakeAbsolute()
+		SearchPath += MariaDBClientIncludePath
+		SearchPath += "../../External/mariadb-connector-c/include"->MakeAbsolute()
 	}
 	%Group "SQL_MySql"
 	{
 		%File "Source/Malterlib_SQL_MySQL.cpp"
 	}
-	%Dependency "Lib_MariaDBConnector"
+	%Dependency "Lib_mariadb-connector-c_mariadbclient"
 	{
 		!DocumentationEnabled true
 		Dependency.Indirect true
