@@ -76,7 +76,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 		{
 			&
 			{
-				PlatformFamily "OSX"
+				PlatformFamily "macOS"
 				|
 				{
 					Compile.CLanguage "C99"
