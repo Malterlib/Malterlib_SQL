@@ -93,7 +93,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 Property
 {
-	MariaDBClientIncludePath define string = GetProperty("Import", "CMake_CacheDirectory", "Group:External.Group:mariadb-connector-c.Target:Lib_mariadb-connector-c_mariadbclient.Import:*") / "include"
+	MariaDBClientIncludePath: string = GetProperty(&Import.CMake_CacheDirectory, "Group:External.Group:mariadb-connector-c.Target:Lib_mariadb-connector-c_mariadbclient.Import:*") / "include"
 }
 
 %Group "{Malterlib}/{Lib_Malterlib_SQL}"
@@ -119,13 +119,13 @@ Property
 
 Property
 {
-	MalterlibLibrary_SQL define bool = MalterlibLibrary_All
+	MalterlibLibrary_SQL: bool = MalterlibLibrary_All
 	MalterlibSubLibraries =+ "SQL"
 	{
 		!!MalterlibLibrary_SQL true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL define bool = true
-//	MalterlibSubLibrarySeparate_Lib_Malterlib_SQL define bool = true
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL: bool = true
+//	MalterlibSubLibrarySeparate_Lib_Malterlib_SQL: bool = true
 	MalterlibIncludeRoots =+ "Include"->MakeAbsolute()
 	{
 		!!MalterlibLibrary_SQL true
@@ -160,12 +160,12 @@ Property
 
 Property
 {
-	MalterlibLibrary_SQL_MySQL define bool = MalterlibLibrary_All
+	MalterlibLibrary_SQL_MySQL: bool = MalterlibLibrary_All
 	MalterlibSubLibraries =+ "SQL_MySQL"
 	{
 		!!MalterlibLibrary_SQL_MySQL true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL_MySQL define bool = true
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_MySQL: bool = true
 }
 
 ///////////
@@ -190,16 +190,16 @@ Property
 		%File "Source/Malterlib_SQL_SQLite.cpp"
 		Property
 		{
-			ScriptFile define string = "Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh"->MakeAbsolute()
-			ScriptFileTranslated define string = ScriptFile
+			ScriptFile: string = "Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh"->MakeAbsolute()
+			ScriptFileTranslated: string = ScriptFile
 			ScriptFileTranslated ScriptFileTranslated->ParseFormatString("{}:{}","/{0,cl}{1}")
 			{
 				!!PlatformFamily "Windows" // For MinGW
 			}
 
-			OutputDirectory define string = "SourceGenerated/SQLite"->MakeAbsolute()
-			SQLiteSources define string = "../../External/sqlite"->MakeAbsolute()
-			TempDir define string = `@(GeneratedDirectory)sqlite/Build`
+			OutputDirectory: string = "SourceGenerated/SQLite"->MakeAbsolute()
+			SQLiteSources: string = "../../External/sqlite"->MakeAbsolute()
+			TempDir: string = `@(GeneratedDirectory)sqlite/Build`
 		}
 		%Group "Source"
 		{
@@ -242,9 +242,9 @@ Property
 
 				Property
 				{
-					ThisFileName define string = this.Identity->GetFile()
-					SourceDependencies define [string] = SQLiteSources->FindDirectoriesRecursiveIn("*", ["*/.git", "*/test", "*/*.test"])
-					BashExecutable define string = "bash"
+					ThisFileName: string = this.Identity->GetFile()
+					SourceDependencies: [string] = SQLiteSources->FindDirectoriesRecursiveIn("*", ["*/.git", "*/test", "*/*.test"])
+					BashExecutable: string = "bash"
 					BashExecutable "C:/Program Files/Git/bin/bash.exe"
 					{
 						!!PlatformFamily "Windows"
@@ -278,20 +278,23 @@ Property
 
 Property
 {
-	MalterlibLibrary_SQL_SQLite define bool = MalterlibLibrary_All
+	MalterlibLibrary_SQL_SQLite: bool = MalterlibLibrary_All
 	MalterlibSubLibraries =+ "SQL_SQLite"
 	{
 		!!MalterlibLibrary_SQL_SQLite true
 	}
-	MalterlibLibrarySeparate_Lib_Malterlib_SQL_SQLite define bool = true
+	MalterlibLibrarySeparate_Lib_Malterlib_SQL_SQLite: bool = true
 }
 
 %Group "{Test}/{Malterlib_SQL}"
 {
-	Property.MalterlibLinkWithBoringSSL true
-
 	%Dependency "Lib_Malterlib_SQL_MySQL"
 	%Dependency "Lib_Malterlib_SQL_SQLite"
+
+	%Dependency "Lib_BoringSSL_decrepit"
+	{
+		!DocumentationEnabled true
+	}
 }
 
 Property
@@ -299,7 +302,7 @@ Property
 	!!MalterlibEnableInternalTests true
 	
 	MalterlibTests =+ "Malterlib_SQL"
-	MalterlibTestFiles_Malterlib_SQL define [type(CEntity)] = ["Test/*"->MakeAbsolute()]
-	MalterlibTestDependencies_Malterlib_SQL define [type(CEntity)] = ["Lib_Malterlib_SQL"]
-	MalterlibTestExtraGroups_Malterlib_SQL define [string] = ["{Test}/{Malterlib_SQL}"]
+	MalterlibTestFiles_Malterlib_SQL: [type(CEntity)] = ["Test/*"->MakeAbsolute()]
+	MalterlibTestDependencies_Malterlib_SQL: [type(CEntity)] = ["Lib_Malterlib_SQL"]
+	MalterlibTestExtraGroups_Malterlib_SQL: [string] = ["{Test}/{Malterlib_SQL}"]
 }
