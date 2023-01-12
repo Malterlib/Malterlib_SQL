@@ -34,8 +34,8 @@ static char *mariadb_progname;
 #define LIBS    "-L%s/lib/mariadb/ -lmariadb"
 #define LIBS_SYS "-ldl -lm -lpthread -l/dev/null"
 #define CFLAGS  INCLUDE
-#define VERSION "10.6.8"
-#define CC_VERSION "3.3.1"
+#define VERSION "10.8.4"
+#define CC_VERSION "3.3.3"
 #define PLUGIN_DIR "%s/lib/mariadb/plugin"
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"

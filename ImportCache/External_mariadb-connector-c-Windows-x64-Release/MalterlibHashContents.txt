@@ -248,7 +248,7 @@ Import.CMake_Variables: [
 	CLIENT_PLUGIN_MYSQL_OLD_PASSWORD=OFF,
 	ZLIB_INCLUDE_DIR=/External/zlib,
 	ZSTD_INCLUDE_DIRS=/External/zstd/lib,
-	ZLIB_LIBRARY=/dev/null"->MakeAbsolute())
+	ZLIB_LIBRARY=/dev/null
 ]
 
 Import.CMake_IncludeInHash: [
