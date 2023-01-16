@@ -1,4 +1,4 @@
-Property.CMakeOutputPath_mariadb\-connector\-c define string = `@('.'->MakeAbsolute())`->MakeAbsolute()
+Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())`->MakeAbsolute()
 %Target "Dll_mariadb-connector-c_pvio_npipe"
 {
 	Compile
