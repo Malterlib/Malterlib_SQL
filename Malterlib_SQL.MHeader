@@ -58,6 +58,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 	{
 		!!CompileDialect "C"
 
+		Analyzer false
 		PrefixHeader undefined
 
 		Warnings "Minimal"
@@ -217,6 +218,12 @@ Property
 		}
 		%Group "SourceGenerated"
 		{
+			Compile
+			{
+				!!CompileDialect "C"
+				Analyzer false
+			}
+			
 			%File `@(OutputDirectory)/sqlite3.c`
 			{
 				Compile.AllowNonExisting true
