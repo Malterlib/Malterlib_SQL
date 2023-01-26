@@ -71,6 +71,11 @@ Import "../Core/Lib_Malterlib.MTarget"
 			!!GeneratorFamily "Xcode"
 		}
 
+		Warnings_DeprecatedNonPrototype false
+		{
+			!!Compiler "Clang"
+		}
+
 		PreprocessorDefines += ["LIBMARIADB", "HAVE_COMPRESS", "THREAD"]
 
 		PreprocessorDefines += ["_XOPEN_SOURCE=700", "_DARWIN_C_SOURCE"]
@@ -184,6 +189,10 @@ Property
 		ExtraCompilerFlags =+ "/wd4996"
 		{
 			!!PlatformFamily "Windows"
+		}
+		Warnings_UnusedButSetVariable false
+		{
+			!!Compiler "Clang"
 		}
 	}
 	%Group "SQL_SQLite"
