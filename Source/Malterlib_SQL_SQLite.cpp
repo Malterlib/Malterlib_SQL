@@ -54,7 +54,7 @@ public:
 	typedef NMib::NStorage::TCVariant<int64, fp64, CStr> CValue;
 
 	struct CRow
- 	{
+	{
 		TCVector<CValue> m_Data;
 	};
 
