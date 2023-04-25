@@ -34,8 +34,8 @@ static char *mariadb_progname;
 #define LIBS    "-L%s/lib/mariadb/ -lmariadb"
 #define LIBS_SYS "-l/dev/null"
 #define CFLAGS  INCLUDE
-#define VERSION "10.8.4"
-#define CC_VERSION "3.3.3"
+#define VERSION "10.8.7"
+#define CC_VERSION "3.3.4"
 #define PLUGIN_DIR "%s/lib/mariadb/plugin"
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"
@@ -118,7 +118,7 @@ void usage(void)
   puts("Copyright 2011-2020 MariaDB Corporation AB");
   puts("Get compiler flags for using the MariaDB Connector/C.");
   printf("Usage: %s [OPTIONS]\n", mariadb_progname);
-  printf("Compiler: Clang 14.0.0\n");
+  printf("Compiler: Clang 14.0.3.14030022\n");
   while (long_options[i].name)
   {
     if (!long_options[i].has_arg)
