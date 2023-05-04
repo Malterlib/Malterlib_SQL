@@ -875,6 +875,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 					{
 						Compile
 						{
+							Type "Custom"
 							Custom_CommandLine `MToolCMake -E remove -f libmariadb.a && MToolCMake -E create_symlink libmariadbclient.a libmariadb.a`
 							AllowNonExisting true
 							Disabled false
