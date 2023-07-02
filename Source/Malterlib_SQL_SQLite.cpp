@@ -38,12 +38,7 @@ public:
 		mp_pStatement = nullptr;
 	}
 
-	void f_Delete()
-	{
-		delete this;
-	}
-
-	virtual CQueryInstance *f_CreateQueryInstance();
+	virtual NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance() override;
 };
 
 class CSQLiteQueryResult : public CQueryResult
@@ -153,10 +148,6 @@ public:
 	{
 		return m_iLastInsertedID;
 	}
-	void f_Delete()
-	{
-		delete this;
-	}
 };
 
 class CSQLiteQueryInstance : public CQueryInstance
@@ -197,13 +188,7 @@ public:
 	{
 	}
 
-	void f_Delete()
-	{
-		delete this;
-	}
-
-
-	CQueryResult *f_Execute(sqlite3 *_pSQLite)
+	TCUniquePointer<CQueryResult> f_Execute(sqlite3 *_pSQLite)
 	{
 		sqlite3_stmt* pStatement = mp_pQuery->mp_pStatement;
 		int Ret;
@@ -269,7 +254,7 @@ public:
 		{
 			pResults->m_nAffectedRows = sqlite3_changes(_pSQLite);
 			pResults->m_iLastInsertedID = sqlite3_last_insert_rowid(_pSQLite);
-			return pResults.f_Detach(); // ??
+			return pResults;
 		}
 
 		if (Ret != SQLITE_ROW)
@@ -376,9 +361,8 @@ public:
 			Ret = sqlite3_step(pStatement);
 		}
 
-		return pResults.f_Detach();
+		return pResults;
 	}
-
 
 	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
@@ -470,9 +454,10 @@ public:
 
 };
 
-CQueryInstance *CSQLiteQuery::f_CreateQueryInstance()
+NStorage::TCUniquePointer<CQueryInstance> CSQLiteQuery::f_CreateQueryInstance()
 {
-	return DMibNew CSQLiteQueryInstance(this);
+	NStorage::TCUniquePointer<CSQLiteQueryInstance> pResult = fg_Construct(this);
+	return pResult;
 }
 
 
@@ -529,7 +514,7 @@ public:
 		return CFStr1024(_pError) + CFStr1024(" SQLite returned: ") + sqlite3_errmsg(mp_pDB);
 	}
 
-	CQuery *f_CreateQuery(NStr::CStr _Query)
+	TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query)
 	{
 //		DMibDTrace("Creating sqlite query: {}\n", _Query);
 		sqlite3_stmt* pStatement = nullptr;
@@ -551,7 +536,7 @@ public:
 			return nullptr;
 		}
 
-		CSQLiteQuery *pQuery = DMibNew CSQLiteQuery(pStatement);
+		TCUniquePointer<CSQLiteQuery> pQuery = fg_Construct(pStatement);
 		return pQuery;
 	}
 
@@ -560,9 +545,9 @@ public:
 		sqlite3_exec(mp_pDB, "BEGIN TRANSACTION", nullptr, nullptr, nullptr);
 	}
 
-	CQueryResult *f_RunQuery(CQueryInstance *_pQuery)
+	TCUniquePointer<CQueryResult> f_RunQuery(TCUniquePointer<CQueryInstance> const &_pQuery)
 	{
-		CSQLiteQueryInstance *pInstance = (CSQLiteQueryInstance *)_pQuery;
+		CSQLiteQueryInstance *pInstance = (CSQLiteQueryInstance *)_pQuery.f_Get();
 
 		return pInstance->f_Execute(mp_pDB);
 	}

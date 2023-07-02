@@ -136,10 +136,6 @@ public:
 	{
 		return m_iLastInsertedID;
 	}
-	void f_Delete()
-	{
-		delete this;
-	}
 };
 
 class CMySqlQueryInstance : public CQueryInstance
@@ -156,13 +152,7 @@ public:
 	{
 	}
 
-	void f_Delete()
-	{
-		delete this;
-	}
-
-
-	CQueryResult *f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp);
+	NStorage::TCUniquePointer<CQueryResult> f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp);
 
 	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
@@ -183,14 +173,9 @@ public:
 	{
 	}
 
-	void f_Delete()
+	virtual NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance()
 	{
-		delete this;
-	}
-
-	virtual CQueryInstance *f_CreateQueryInstance()
-	{
-		CMySqlQueryInstance *pQueryInst = DMibNew CMySqlQueryInstance;
+		NStorage::TCUniquePointer<CMySqlQueryInstance> pQueryInst = fg_Construct();
 		pQueryInst->m_pQuery = this;
 		return pQueryInst;
 	}
@@ -232,7 +217,7 @@ public:
 	MYSQL m_Conn;
 	MYSQL *m_pConn;
 
-	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters)
+	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters) override
 	{
         m_pConn = mysql_init(&m_Conn);
 		ms_MainThreadCleanup.m_bDoneInit = true;
@@ -265,7 +250,7 @@ public:
 			return false;
 	}
 
-	virtual void f_Destroy(bool _bDestroyThread)
+	virtual void f_Destroy(bool _bDestroyThread) override
 	{
 		if (m_pConn)
 		{
@@ -284,30 +269,30 @@ public:
 	}
 
 
-	CQuery *f_CreateQuery(NStr::CStr _Query)
+	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) override
 	{
-		CMySqlQuery *pQuery = DMibNew CMySqlQuery;
+		NStorage::TCUniquePointer<CMySqlQuery> pQuery = fg_Construct();
 		pQuery->m_Statement = _Query;
 		return pQuery;
 	}
 
-	void f_BeginTransaction()
+	void f_BeginTransaction() override
 	{
 	}
 
-	CQueryResult *f_RunQuery(CQueryInstance *_pQuery)
+	NStorage::TCUniquePointer<CQueryResult> f_RunQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQuery) override
 	{
-		CMySqlQueryInstance *pInstance = (CMySqlQueryInstance *)_pQuery;
+		CMySqlQueryInstance *pInstance = (CMySqlQueryInstance *)_pQuery.f_Get();
 
 		return pInstance->f_Execute(this);
 	}
 
-	void f_CommitTransaction()
+	void f_CommitTransaction() override
 	{
 		mysql_commit(m_pConn);
 	}
 
-	void f_RollbackTransaction()
+	void f_RollbackTransaction() override
 	{
 		mysql_rollback(m_pConn);
 	}
@@ -319,7 +304,7 @@ CDatabaseImplementation_MySql::CMainThreadCleanup CDatabaseImplementation_MySql:
 DMibRuntimeClassNamedCasted(NMib::NSQL::CDatabaseImplementation, CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation);
 
 
-CQueryResult *CMySqlQueryInstance::f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp)
+NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp)
 {
 	CDatabaseImplementation_MySql *pImp = (CDatabaseImplementation_MySql *)_pImp;
 
@@ -363,7 +348,7 @@ CQueryResult *CMySqlQueryInstance::f_Execute(NMib::NSQL::CDatabaseImplementation
 		}
 	}
 
-	CMySqlQueryResult *pResult = DMibNew CMySqlQueryResult;
+	NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
 
 	pResult->m_nAffectedRows = mysql_affected_rows(pImp->m_pConn);
 	MYSQL_RES *pRes = mysql_store_result(pImp->m_pConn);
