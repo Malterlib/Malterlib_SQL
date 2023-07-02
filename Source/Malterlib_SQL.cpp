@@ -26,33 +26,21 @@ namespace NMib::NSQL
 
 	CTransactionResult::~CTransactionResult()
 	{
-		m_Results.f_DeleteAll();
+		m_Results.f_Clear();
 	}
 
 	CQueryResult *CTransactionResult::f_GetQueryResult(aint _iQuery)
 	{
 		if (_iQuery < 0 || (mint)_iQuery >= m_Results.f_GetLen())
 			return nullptr;
-		return m_Results[_iQuery];
-	}
-
-
-	CTransaction::CQueryLink::CQueryLink()
-	{
-		m_pQueryInstance = nullptr;
-	}
-
-	CTransaction::CQueryLink::~CQueryLink()
-	{
-		if (m_pQueryInstance)
-			m_pQueryInstance->f_Delete();
+		return m_Results[_iQuery].f_Get();
 	}
 
 	CTransactionHandler::~CTransactionHandler()
 	{
 	}
 
-	void CTransactionHandler::fs_HandleTransaction(CTransactionResult *_pResult, void *_pContext)
+	void CTransactionHandler::fs_HandleTransaction(NStorage::TCUniquePointer<CTransactionResult> const &_pResult, void *_pContext)
 	{
 		((CTransactionHandler *)_pContext)->f_HandleTransaction(_pResult);
 	}
@@ -71,8 +59,6 @@ namespace NMib::NSQL
 
 	CSQLConnection::CTask::~CTask()
 	{
-		if (m_pResult)
-			delete m_pResult;
 	}
 
 	void CSQLConnection::fp_QueueTask(CTask *_pTask)
@@ -84,26 +70,26 @@ namespace NMib::NSQL
 
 	}
 
-	CTransactionResult *CSQLConnection::fp_CommitTransaction(CTransaction *_pTransaction, CDatabaseImplementation *_pImp)
+	NStorage::TCUniquePointer<CTransactionResult> CSQLConnection::fp_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction, CDatabaseImplementation *_pImp)
 	{
 		_pImp->f_BeginTransaction();
 
-		CTransactionResult *pResult = DMibNew CTransactionResult;
-		pResult->m_Results.f_SetLen(_pTransaction->m_nTransactions);
-		NMemory::fg_ObjectSet(pResult->m_Results.f_GetArray(), (CQueryResult *)nullptr, _pTransaction->m_nTransactions);
+		auto pTransaction = fg_Move(_pTransaction);
+
+		NStorage::TCUniquePointer<CTransactionResult> pResult = fg_Construct();
+		pResult->m_Results.f_SetLen(pTransaction->m_nTransactions);
 		int iResult = 0;
-		CTransaction::CQueryIter Iter = _pTransaction->m_Transactions;
+		CTransaction::CQueryIter Iter = pTransaction->m_Transactions;
 
 		while (Iter)
 		{
-			CQueryResult * pRes = _pImp->f_RunQuery(Iter->m_pQueryInstance);
-			if (!pRes && !_pTransaction->m_bAllowFail)
+			auto pRes = _pImp->f_RunQuery(Iter->m_pQueryInstance);
+			if (!pRes && !pTransaction->m_bAllowFail)
 			{
-				delete pResult;
 				_pImp->f_RollbackTransaction();
 				return nullptr;
 			}
-			pResult->m_Results[iResult++] = pRes;
+			pResult->m_Results[iResult++] = fg_Move(pRes);
 
 			++Iter;
 		}
@@ -112,7 +98,6 @@ namespace NMib::NSQL
 
 		return pResult;
 	}
-
 
 	NStr::CStr CSQLConnection::CWorkerThread::f_GetThreadName()
 	{
@@ -178,15 +163,14 @@ namespace NMib::NSQL
 
 	void CSQLConnection::CTask::f_Run(CDatabaseImplementation *_pImp)
 	{
-		CTransactionResult *pResult = m_pSQL->fp_CommitTransaction(m_pTransaction, _pImp);
+		auto pResult = m_pSQL->fp_CommitTransaction(fg_Move(m_pTransaction), _pImp);
 		if (m_bAsync)
 		{
 			m_fCallback(pResult, m_pContext);
-			delete pResult;
 			delete this;
 			return;
 		}
-		m_pResult = pResult;
+		m_pResult = fg_Move(pResult);
 		m_pSQL->fp_QueueTask(this);
 		//_pImp->f_CreateQuery()
 	}
@@ -249,41 +233,41 @@ namespace NMib::NSQL
 	}
 
 
-	CQueryResult *CSQLConnection::f_ExecuteQuery(const NStr::CStr &_Query, bool _bTransaction)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(const NStr::CStr &_Query, bool _bTransaction)
 	{
-		CQuery *pQuery = f_CreateQuery(_Query);
+		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
 		if (!pQuery)
 			return nullptr;
-		CQueryInstance *pInst = pQuery->f_CreateQueryInstance();
+
+		NStorage::TCUniquePointer<CQueryInstance> pInst = pQuery->f_CreateQueryInstance();
 		if (!pInst)
-		{
-			pQuery->f_Delete();
 			return nullptr;
-		}
+
 		if (_bTransaction)
 			mp_pMainImp->f_BeginTransaction();
-		CQueryResult *pRes = mp_pMainImp->f_RunQuery(pInst);
-		pInst->f_Delete();
-		pQuery->f_Delete();
+
+		auto pRes = mp_pMainImp->f_RunQuery(pInst);
 		if (!pRes)
 		{
 			if (_bTransaction)
 				mp_pMainImp->f_RollbackTransaction();
 			return nullptr;
 		}
+
 		if (_bTransaction)
 			mp_pMainImp->f_CommitTransaction();
+
 		return pRes;
 	}
 
-	CQueryResult *CSQLConnection::f_ExecuteQuery(CQuery *_pQuery)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery)
 	{
-		TCUniquePointer<CQueryInstance>pInst = fg_Explicit(_pQuery->f_CreateQueryInstance());
+		auto pInst = _pQuery->f_CreateQueryInstance();
 		if (!pInst)
 			return nullptr;
 
 		mp_pMainImp->f_BeginTransaction();
-		CQueryResult *pRes = mp_pMainImp->f_RunQuery(pInst.f_Get());
+		auto pRes = mp_pMainImp->f_RunQuery(pInst);
 		pInst = 0;
 
 		if (!pRes)
@@ -297,10 +281,10 @@ namespace NMib::NSQL
 	}
 
 
-	CQueryResult *CSQLConnection::f_ExecuteQuery(CQueryInstance *_pQueryInst)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst)
 	{
 		mp_pMainImp->f_BeginTransaction();
-		CQueryResult *pRes = mp_pMainImp->f_RunQuery(_pQueryInst);
+		auto pRes = mp_pMainImp->f_RunQuery(_pQueryInst);
 		if (!pRes)
 		{
 			mp_pMainImp->f_RollbackTransaction();
@@ -310,13 +294,20 @@ namespace NMib::NSQL
 		return pRes;
 	}
 
-	CTransactionResult *CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction)
+	NStorage::TCUniquePointer<CTransactionResult> CSQLConnection::f_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction)
 	{
-		return fp_CommitTransaction(_pTransaction, mp_pMainImp.f_Get());
+		return fp_CommitTransaction(fg_Move(_pTransaction), mp_pMainImp.f_Get());
 	}
 
 	// Async transactions
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, PFTransactionResultCallback *_fCallback, bool _bAsync)
+	void CSQLConnection::f_CommitTransaction
+		(
+			NStorage::TCUniquePointer<CTransaction> &&_pTransaction
+			, void * _pContext
+			, NThread::CSemaphoreAggregate *_pEvent
+			, FTransactionResultCallback *_fCallback
+			, bool _bAsync
+		)
 	{
 		CWorkerThread *pThread = nullptr;
 		while (!pThread)
@@ -332,7 +323,7 @@ namespace NMib::NSQL
 		}
 
 		CTask *pTask = DMibNew CTask(this);
-		pTask->m_pTransaction = _pTransaction;
+		pTask->m_pTransaction = fg_Move(_pTransaction);
 		pTask->m_pContext = _pContext;
 		pTask->m_pEvent = _pEvent;
 		pTask->m_fCallback = _fCallback;
@@ -341,9 +332,9 @@ namespace NMib::NSQL
 		pThread->m_EventWantQuit.f_Signal();
 	}
 
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreAggregate *_pEvent, bool _bAsync)
+	void CSQLConnection::f_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction, CTransactionHandler *_pHandler, NThread::CSemaphoreAggregate *_pEvent, bool _bAsync)
 	{
-		f_CommitTransaction(_pTransaction, _pHandler, _pEvent, CTransactionHandler::fs_HandleTransaction, _bAsync);
+		f_CommitTransaction(fg_Move(_pTransaction), _pHandler, _pEvent, &CTransactionHandler::fs_HandleTransaction, _bAsync);
 	}
 
 	void CSQLConnection::f_ProcessTansactions()
@@ -370,43 +361,40 @@ namespace NMib::NSQL
 		}
 	}
 
-	CTransaction *CSQLConnection::f_CreateTransaction()
+	NStorage::TCUniquePointer<CTransaction> CSQLConnection::f_CreateTransaction()
 	{
-		return DMibNew CTransaction;
-
+		return fg_Construct();
 	}
 
-	CTransaction *CSQLConnection::f_CreateTransaction(CStr const& _Statements)	// Create a transaction from a list of semi-colon separated statements.
+	NStorage::TCUniquePointer<CTransaction> CSQLConnection::f_CreateTransaction(CStr const& _Statements)	// Create a transaction from a list of semi-colon separated statements.
 	{
 		TCUniquePointer<CTransaction> pTransaction = fg_Construct();
 
 		CStr Statements = _Statements;
 		CStr CurStatement;
 
-		TCUniquePointer<CQuery> pQuery;
-
 		while (!Statements.f_IsEmpty())
 		{
 			CurStatement = fg_GetStrSep(Statements, ";");
 			CurStatement = CurStatement.f_Trim();
 
-			pQuery = fg_Explicit(f_CreateQuery(CurStatement));
+			auto pQuery = f_CreateQuery(CurStatement);
 			if (!pQuery)
 				return nullptr;
 
-			pTransaction->f_AddQuery(pQuery.f_Get());
-			pTransaction->m_OwnedQueries.f_Insert() = fg_Explicit(pQuery.f_Detach());
+			pTransaction->f_AddQuery(pQuery);
+			pTransaction->m_OwnedQueries.f_Insert(fg_Move(pQuery));
 		}
 
-		return pTransaction.f_Detach();
+		return pTransaction;
 	}
 
-	CQuery *CSQLConnection::f_CreateQuery(const NStr::CStr &_Query)
+	NStorage::TCUniquePointer<CQuery> CSQLConnection::f_CreateQuery(const NStr::CStr &_Query)
 	{
 		return mp_pMainImp->f_CreateQuery(_Query);
 	}
 
-	CQueryInstance *CSQLConnection::f_CreateQueryInstance(CQuery* _pQuery)
+	NStorage::TCUniquePointer<CQueryInstance> CSQLConnection::f_CreateQueryInstance(NStorage::TCUniquePointer<CQuery> const &_pQuery)
 	{
 		return _pQuery->f_CreateQueryInstance();
 	}
@@ -422,18 +410,13 @@ namespace NMib::NSQL
 		m_Transactions.f_DeleteAll();
 	}
 
-	CQueryInstance *CTransaction::f_AddQuery(CQuery *_pQuery)
+	NStorage::TCUniquePointer<CQueryInstance> const &CTransaction::f_AddQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery)
 	{
 		++m_nTransactions;
 		CQueryLink *pLink = DMibNew CQueryLink;
 		pLink->m_pQueryInstance = _pQuery->f_CreateQueryInstance();
 		m_Transactions.f_Insert(pLink);
 		return pLink->m_pQueryInstance;
-	}
-
-	void CTransaction::f_Delete()
-	{
-		delete this;
 	}
 
 	void CTransaction::f_SetAllowFail(bool _bAllow)
@@ -449,7 +432,7 @@ namespace NMib::NSQL
 	CQueryInstance *CSQLConnection::f_CreateQueryInstance(CQuery *_pQuery);
 
 	// Async transactions
-	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, PFTransactionResultCallback *_fCallback);
+	void CSQLConnection::f_CommitTransaction(CTransaction *_pTransaction, void * _pContext, NThread::CSemaphoreAggregate *_pEvent, FTransactionResultCallback *_fCallback);
 	CTransactionResult *CSQLConnection::f_GetTransacitonResult(void * &_pContext);
 */
 }
