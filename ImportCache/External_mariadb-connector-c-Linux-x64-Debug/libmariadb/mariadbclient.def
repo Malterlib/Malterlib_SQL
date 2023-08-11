@@ -367,3 +367,13 @@ local:
  *;
 };
 };
+VERSION {
+libmariadb_3_3_5 {
+global:
+ mariadb_rpl_extract_rows;
+ mariadb_rpl_error;
+ mariadb_rpl_errno;
+local:
+ *;
+};
+};

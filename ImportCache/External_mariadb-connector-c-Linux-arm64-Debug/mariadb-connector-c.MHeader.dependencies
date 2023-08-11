@@ -1,11 +1,11 @@
 ../../../../External/mariadb-connector-c/CMakeLists.txt
-../../../../External/mariadb-connector-c/cmake/CheckFunctions.cmake
-../../../../External/mariadb-connector-c/cmake/CheckIncludeFiles.cmake
-../../../../External/mariadb-connector-c/cmake/CheckTypes.cmake
 ../../../../External/mariadb-connector-c/cmake/ConnectorName.cmake
 ../../../../External/mariadb-connector-c/cmake/FindGSSAPI.cmake
 ../../../../External/mariadb-connector-c/cmake/FindZStd.cmake
 ../../../../External/mariadb-connector-c/cmake/SearchLibrary.cmake
+../../../../External/mariadb-connector-c/cmake/check_functions.cmake
+../../../../External/mariadb-connector-c/cmake/check_include_files.cmake
+../../../../External/mariadb-connector-c/cmake/check_types.cmake
 ../../../../External/mariadb-connector-c/cmake/export.cmake
 ../../../../External/mariadb-connector-c/cmake/install.cmake
 ../../../../External/mariadb-connector-c/cmake/install_plugins.cmake

@@ -32,10 +32,10 @@ static char *mariadb_progname;
 
 #define INCLUDE "-I%s/include/mariadb -I%s/include/mariadb/mysql"
 #define LIBS    "-L%s/lib/mariadb/ -lmariadb"
-#define LIBS_SYS "-ldl -lm -lpthread -l/dev/null"
+#define LIBS_SYS "-lc -ldl -lm -lpthread"
 #define CFLAGS  INCLUDE
-#define VERSION "10.8.7"
-#define CC_VERSION "3.3.4"
+#define VERSION "10.8.8"
+#define CC_VERSION "3.3.5"
 #define PLUGIN_DIR "%s/lib/mariadb/plugin"
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"
@@ -49,7 +49,7 @@ static char *mariadb_progname;
 #define PKG_LIBDIR "%s/lib/mariadb"
 
 #ifdef HAVE_EMBEDDED
-#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -ldl -lm -lpthread -l/dev/null"
+#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -lc -ldl -lm -lpthread"
 #endif
 
 #if defined(SOLARIS) || defined(__sun)
@@ -118,7 +118,7 @@ void usage(void)
   puts("Copyright 2011-2020 MariaDB Corporation AB");
   puts("Get compiler flags for using the MariaDB Connector/C.");
   printf("Usage: %s [OPTIONS]\n", mariadb_progname);
-  printf("Compiler: Clang 15.0.7\n");
+  printf("Compiler: Clang 16.0.5\n");
   while (long_options[i].name)
   {
     if (!long_options[i].has_arg)

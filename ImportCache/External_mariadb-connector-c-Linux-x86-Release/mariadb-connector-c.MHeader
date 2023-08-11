@@ -293,6 +293,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 		{
 			Compile.Type "C"
 		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
+		{
+			Compile.Type "C"
+		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_hashtbl.c`
 		{
 			Compile.Type "C"
@@ -667,6 +671,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			Compile.Type "C"
 		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_charset.c`
+		{
+			Compile.Type "C"
+		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
 		{
 			Compile.Type "C"
 		}

@@ -10,9 +10,9 @@
 #include <custom_conf.h>
 #else
 #define PROTOCOL_VERSION		10
-#define MARIADB_CLIENT_VERSION_STR	"10.8.7"
+#define MARIADB_CLIENT_VERSION_STR	"10.8.8"
 #define MARIADB_BASE_VERSION		"mariadb-10.8"
-#define MARIADB_VERSION_ID		100807
+#define MARIADB_VERSION_ID		100808
 #define MARIADB_PORT	        	3306
 #define MARIADB_UNIX_ADDR               "/tmp/mysql.sock"
 #ifndef MYSQL_UNIX_ADDR
@@ -23,11 +23,11 @@
 #endif
 
 #define MYSQL_CONFIG_NAME               "my"
-#define MYSQL_VERSION_ID                100807
-#define MYSQL_SERVER_VERSION            "10.8.7-MariaDB"
+#define MYSQL_VERSION_ID                100808
+#define MYSQL_SERVER_VERSION            "10.8.8-MariaDB"
 
-#define MARIADB_PACKAGE_VERSION "3.3.4"
-#define MARIADB_PACKAGE_VERSION_ID 30304
+#define MARIADB_PACKAGE_VERSION "3.3.5"
+#define MARIADB_PACKAGE_VERSION_ID 30305
 #define MARIADB_SYSTEM_TYPE "Darwin"
 #define MARIADB_MACHINE_TYPE "arm64"
 #define MARIADB_PLUGINDIR "/usr/local/lib/mariadb/plugin"
@@ -39,6 +39,6 @@
 #endif
 
 /* Source information */
-#define CC_SOURCE_REVISION "d9ade5b1667a6a372b9ee828f7bc59fb0445a770"
+#define CC_SOURCE_REVISION "657de6fc8d5e65d1ad97fb821ee89559ce4e7b46"
 
 #endif /* _mariadb_version_h_ */

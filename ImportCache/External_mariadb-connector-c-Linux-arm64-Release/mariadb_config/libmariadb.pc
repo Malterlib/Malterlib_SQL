@@ -11,10 +11,10 @@ includedir=${prefix}/include/mariadb/
 libdir=${prefix}/lib/mariadb/
 
 Name: libmariadb
-Version: 3.3.4
+Version: 3.3.5
 Description: MariaDB Connector/C dynamic library
 Cflags: -I${includedir}
 Libs: -L${libdir} -lmariadb
-Libs.private: -ldl -lm -lpthread -l/dev/null
+Libs.private: -lc -ldl -lm -lpthread
 
 
