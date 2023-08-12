@@ -230,9 +230,9 @@ Import.CMake_Variables: [
 	CMAKE_OBJECT_PATH_MAX=4096,
 	,
 	OPENSSL_ROOT_DIR=/External/boringssl,
-	OPENSSL_LIBRARIES=/dev/null,
-	OPENSSL_CRYPTO_LIBRARY=/dev/null,
-	OPENSSL_SSL_LIBRARY=/dev/null,
+	OPENSSL_LIBRARIES=kernel32.lib,
+	OPENSSL_CRYPTO_LIBRARY=kernel32.lib,
+	OPENSSL_SSL_LIBRARY=kernel32.lib,
 	WITH_UNIT_TESTS=OFF,
 	WITH_EXTERNAL_ZLIB=ON,
 	CLIENT_PLUGIN_DIALOG=OFF,
@@ -245,7 +245,7 @@ Import.CMake_Variables: [
 	CLIENT_PLUGIN_MYSQL_OLD_PASSWORD=OFF,
 	ZLIB_INCLUDE_DIR=/External/zlib,
 	ZSTD_INCLUDE_DIRS=/External/zstd/lib,
-	ZLIB_LIBRARY=/dev/null
+	ZLIB_LIBRARY=kernel32.lib
 ]
 
 Import.CMake_IncludeInHash: [

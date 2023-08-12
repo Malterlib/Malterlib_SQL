@@ -232,3 +232,6 @@ mysql_thread_init
 mysql_thread_safe
 mysql_use_result
 mysql_warning_count
+mariadb_rpl_extract_rows
+mariadb_rpl_error
+mariadb_rpl_errno

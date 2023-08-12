@@ -86,6 +86,7 @@ static pthread_mutex_t LOCK_load_client_plugin;
  extern struct st_mysql_client_plugin auth_gssapi_client_client_plugin;
  extern struct st_mysql_client_plugin zlib_client_plugin;
  extern struct st_mysql_client_plugin pvio_socket_client_plugin;
+ extern struct st_mysql_client_plugin pvio_npipe_client_plugin;
 
 
 struct st_mysql_client_plugin *mysql_client_builtins[]=
@@ -97,6 +98,7 @@ struct st_mysql_client_plugin *mysql_client_builtins[]=
    (struct st_mysql_client_plugin *)&auth_gssapi_client_client_plugin,
    (struct st_mysql_client_plugin *)&zlib_client_plugin,
    (struct st_mysql_client_plugin *)&pvio_socket_client_plugin,
+   (struct st_mysql_client_plugin *)&pvio_npipe_client_plugin,
 
   0
 };

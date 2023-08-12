@@ -1,94 +1,4 @@
 Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())`->MakeAbsolute()
-%Target "Dll_mariadb-connector-c_pvio_npipe"
-{
-	Compile
-	{
-		!!Compile.Type "WindowsResource"
-		SearchPath += [
-			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
-			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute()
-		]
-		PreprocessorDefines += [
-			"HAVE_DLOPEN",
-			"HAVE_SCHANNEL",
-			"HAVE_TLS",
-			"HAVE_WINCRYPT",
-			"MARIADB_MACHINE_TYPE=\"x86_64\"",
-			"MARIADB_SYSTEM_TYPE=\"Windows\"",
-			"WIN32_LEAN_AND_MEAN",
-			"_CRT_SECURE_NO_WARNINGS",
-			"pvio_npipe_EXPORTS"
-		]
-	}
-	Compile
-	{
-		!!Compile.Type "C"
-		SearchPath += [
-			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
-			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute()
-		]
-		PreprocessorDefines += [
-			"HAVE_DLOPEN",
-			"HAVE_SCHANNEL",
-			"HAVE_TLS",
-			"HAVE_WINCRYPT",
-			"MARIADB_MACHINE_TYPE=\"x86_64\"",
-			"MARIADB_SYSTEM_TYPE=\"Windows\"",
-			"WIN32_LEAN_AND_MEAN",
-			"_CRT_SECURE_NO_WARNINGS",
-			"pvio_npipe_EXPORTS"
-		]
-	}
-	Property.MalterlibTargetNameType "Normal"
-	Compile.AllowNonExisting true
-	Target.Group "External/mariadb-connector-c"
-	{
-		!!Target.Group undefined
-	}
-	Target.Type "DynamicLibrary"
-	Target.BaseName "mariadb-connector-c_pvio_npipe"
-	Target.BaseFileName "pvio_npipe"
-	%Group "plugins"
-	{
-		%Group "pvio"
-		{
-			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio/pvio_npipe.c`
-			{
-				Compile.Type "C"
-			}
-		}
-		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/plugin.def`
-		{
-			Compile.Disabled true
-		}
-	}
-	%Group "Windows"
-	{
-		%Group "x64"
-		{
-			%Group `@(FullConfiguration)`
-			{
-				%Group "win"
-				{
-					%File `@('.'->MakeAbsolute())/win/pvio_npipe.rc`
-					{
-						Compile.Type "WindowsResource"
-					}
-				}
-			}
-		}
-	}
-}
 %Target "Dll_mariadb-connector-c_pvio_shmem"
 {
 	Compile
@@ -110,6 +20,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_WINCRYPT",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS",
 			"pvio_shmem_EXPORTS"
@@ -134,6 +45,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_WINCRYPT",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS",
 			"pvio_shmem_EXPORTS"
@@ -203,6 +115,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_WINCRYPT",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
 			"SIZEOF_CHARP=8",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS"
@@ -426,6 +339,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			{
 				Compile.Type "C"
 			}
+			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio/pvio_npipe.c`
+			{
+				Compile.Type "C"
+			}
 		}
 	}
 	%Group "libmariadb"
@@ -454,6 +371,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			Compile.Type "C"
 		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_charset.c`
+		{
+			Compile.Type "C"
+		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
 		{
 			Compile.Type "C"
 		}
@@ -618,6 +539,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_WINCRYPT",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
 			"SIZEOF_CHARP=8",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS",
@@ -646,6 +568,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_WINCRYPT",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
 			"SIZEOF_CHARP=8",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_SECURE_NO_WARNINGS",
@@ -897,6 +820,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			{
 				Compile.Type "C"
 			}
+			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio/pvio_npipe.c`
+			{
+				Compile.Type "C"
+			}
 		}
 	}
 	%Group "libmariadb"
@@ -925,6 +852,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			Compile.Type "C"
 		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_charset.c`
+		{
+			Compile.Type "C"
+		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
 		{
 			Compile.Type "C"
 		}

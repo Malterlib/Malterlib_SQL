@@ -38,7 +38,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 	Import.CMake_Variables =+ `ZLIB_INCLUDE_DIR=@("../../External/zlib"->MakeAbsolute())`
 	Import.CMake_Variables =+ `ZSTD_INCLUDE_DIRS=@("../../External/zstd/lib"->MakeAbsolute())`
-	Import.CMake_Variables =+ "ZLIB_LIBRARY=/dev/null"
+	Import.CMake_Variables =+ `ZLIB_LIBRARY=@(Malterlib_DummmyLibrary)`
 
 	Import.CMake_Variables =+ "CMAKE_BUILD_WITH_INSTALL_RPATH=ON"
 	{
