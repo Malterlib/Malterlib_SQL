@@ -15,6 +15,6 @@ Version: 3.3.5
 Description: MariaDB Connector/C dynamic library
 Cflags: -I${includedir}
 Libs: -L${libdir} -lmariadb
-Libs.private: -l/private/var/db/xcode_select_link/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd
+Libs.private: -l/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd
 
 

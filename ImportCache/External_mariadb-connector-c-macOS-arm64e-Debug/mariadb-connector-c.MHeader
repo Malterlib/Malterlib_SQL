@@ -106,7 +106,8 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
 			"HAVE_OPENSSL",
@@ -346,6 +347,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 		{
 			Compile.Type "C"
 		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
+		{
+			Compile.Type "C"
+		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_hashtbl.c`
 		{
 			Compile.Type "C"
@@ -482,7 +487,8 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
-			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
 			"HAVE_OPENSSL",
@@ -723,6 +729,10 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 		{
 			Compile.Type "C"
 		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_decimal.c`
+		{
+			Compile.Type "C"
+		}
 		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb/ma_hashtbl.c`
 		{
 			Compile.Type "C"
@@ -873,6 +883,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 					{
 						Compile
 						{
+							Type "Custom"
 							Custom_CommandLine `MToolCMake -E remove -f libmariadb.a && MToolCMake -E create_symlink libmariadbclient.a libmariadb.a`
 							AllowNonExisting true
 							Disabled false

@@ -32,7 +32,7 @@ static char *mariadb_progname;
 
 #define INCLUDE "-I%s/include/mariadb -I%s/include/mariadb/mysql"
 #define LIBS    "-L%s/lib/mariadb/ -lmariadb"
-#define LIBS_SYS "-l/private/var/db/xcode_select_link/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd"
+#define LIBS_SYS "-l/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd"
 #define CFLAGS  INCLUDE
 #define VERSION "10.8.8"
 #define CC_VERSION "3.3.5"
@@ -49,7 +49,7 @@ static char *mariadb_progname;
 #define PKG_LIBDIR "%s/lib/mariadb"
 
 #ifdef HAVE_EMBEDDED
-#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -l/private/var/db/xcode_select_link/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd"
+#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -l/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd"
 #endif
 
 #if defined(SOLARIS) || defined(__sun)
@@ -118,7 +118,7 @@ void usage(void)
   puts("Copyright 2011-2020 MariaDB Corporation AB");
   puts("Get compiler flags for using the MariaDB Connector/C.");
   printf("Usage: %s [OPTIONS]\n", mariadb_progname);
-  printf("Compiler: Clang 16.0.5\n");
+  printf("Compiler: Clang 17.0.2\n");
   while (long_options[i].name)
   {
     if (!long_options[i].has_arg)
