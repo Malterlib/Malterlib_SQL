@@ -95,6 +95,21 @@ Import "../Core/Lib_Malterlib.MTarget"
 			}
 		}
 	}
+
+	%Target "Lib_mariadb-connector-c_mariadbclient"
+	{
+		%Dependency ["shlwapi.lib", "Secur32.lib", "Bcrypt.lib"]
+		{
+			!!PlatformFamily "Windows"
+
+			Dependency.Type "Library"
+		}
+	}
+
+	Target
+	{
+		ExtraGroups =+ "{Malterlib}/{Lib_Malterlib_Cryptography}/{DependOnBoringSSL}"
+	}
 }
 
 Property
