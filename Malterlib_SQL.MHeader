@@ -104,6 +104,10 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 			Dependency.Type "Library"
 		}
+
+		%File "../Core/Source/Dummy/Dummy.cpp"
+		{
+		}
 	}
 
 	Target
