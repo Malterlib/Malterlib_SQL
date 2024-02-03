@@ -105,9 +105,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 			Dependency.Type "Library"
 		}
 
-		%File "../Core/Source/Dummy/Dummy.cpp"
-		{
-		}
+		Property.MalterlibNeedLanguage_Cxx true
 	}
 
 	Target
