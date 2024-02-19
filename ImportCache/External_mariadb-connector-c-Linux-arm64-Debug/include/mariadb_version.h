@@ -26,8 +26,8 @@
 #define MYSQL_VERSION_ID                100808
 #define MYSQL_SERVER_VERSION            "10.8.8-MariaDB"
 
-#define MARIADB_PACKAGE_VERSION "3.3.5"
-#define MARIADB_PACKAGE_VERSION_ID 30305
+#define MARIADB_PACKAGE_VERSION "3.3.9"
+#define MARIADB_PACKAGE_VERSION_ID 30309
 #define MARIADB_SYSTEM_TYPE "Linux"
 #define MARIADB_MACHINE_TYPE "arm64"
 #define MARIADB_PLUGINDIR "/usr/local/lib/mariadb/plugin"
@@ -39,6 +39,6 @@
 #endif
 
 /* Source information */
-#define CC_SOURCE_REVISION "657de6fc8d5e65d1ad97fb821ee89559ce4e7b46"
+#define CC_SOURCE_REVISION "53d39f55825fb1b02161fd4b1785d90f09845535"
 
 #endif /* _mariadb_version_h_ */

@@ -22,6 +22,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
 			"pvio_shmem_EXPORTS"
 		]
@@ -47,6 +48,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
 			"pvio_shmem_EXPORTS"
 		]
@@ -118,6 +120,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"NOGDI",
 			"SIZEOF_CHARP=4",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS"
 		]
 	}
@@ -543,6 +546,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"NOGDI",
 			"SIZEOF_CHARP=4",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS"
 		]
 	}
@@ -588,6 +592,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"NOGDI",
 			"SIZEOF_CHARP=4",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
 			"libmariadb_EXPORTS"
 		]
@@ -617,6 +622,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"NOGDI",
 			"SIZEOF_CHARP=4",
 			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
 			"libmariadb_EXPORTS"
 		]

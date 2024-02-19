@@ -35,12 +35,12 @@ static char *mariadb_progname;
 #define LIBS_SYS "-lc -ldl -lm -lpthread"
 #define CFLAGS  INCLUDE
 #define VERSION "10.8.8"
-#define CC_VERSION "3.3.5"
+#define CC_VERSION "3.3.9"
 #define PLUGIN_DIR "%s/lib/mariadb/plugin"
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"
 #ifdef HAVE_TLS
-#define TLS_LIBRARY_VERSION "OpenSSL 1.1.1k"
+#define TLS_LIBRARY_VERSION "OpenSSL 1.1.1f"
 #else
 #define TLS_LIBRARY_VERSION ""
 #endif

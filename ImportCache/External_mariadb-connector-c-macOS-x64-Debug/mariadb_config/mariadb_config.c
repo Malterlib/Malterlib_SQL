@@ -35,7 +35,7 @@ static char *mariadb_progname;
 #define LIBS_SYS "-l/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libSystem.B.tbd"
 #define CFLAGS  INCLUDE
 #define VERSION "10.8.8"
-#define CC_VERSION "3.3.5"
+#define CC_VERSION "3.3.9"
 #define PLUGIN_DIR "%s/lib/mariadb/plugin"
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"
