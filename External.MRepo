@@ -1,8 +1,8 @@
 {
 	"../../External/mariadb-connector-c": {
-		"Hash": "657de6fc8d5e65d1ad97fb821ee89559ce4e7b46"
+		"Hash": "53d39f55825fb1b02161fd4b1785d90f09845535"
 	},
 	"../../External/sqlite": {
-		"Hash": "036ef4eabc8d6e33ef3af80f786bed473cb50d99"
+		"Hash": "a73550f5340dc140453f25b8530a70be132feee3"
 	}
 }
