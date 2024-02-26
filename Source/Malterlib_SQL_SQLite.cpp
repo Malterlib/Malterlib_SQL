@@ -261,7 +261,7 @@ public:
 
 		while (Ret == SQLITE_BUSY)
 		{
-			NSys::fg_Thread_Sleep(0);
+			NSys::fg_Thread_Sleep(NMib::NTime::NPlatform::fg_TimeRaw_Resolution());
 			Ret = sqlite3_step(pStatement);
 		}
 
@@ -540,7 +540,7 @@ public:
 
 		while (SQLITE_BUSY == (Ret = sqlite3_prepare_v2(mp_pDB, UTF8Query.f_GetStr(), -1, &pStatement, nullptr)))
 		{
-			NSys::fg_Thread_Sleep(0);
+			NSys::fg_Thread_Sleep(NMib::NTime::NPlatform::fg_TimeRaw_Resolution());
 		};
 
 		if (Ret != SQLITE_OK)
