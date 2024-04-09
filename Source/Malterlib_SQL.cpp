@@ -233,54 +233,6 @@ namespace NMib::NSQL
 	}
 
 
-	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(const NStr::CStr &_Query, bool _bTransaction)
-	{
-		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
-		if (!pQuery)
-			return nullptr;
-
-		NStorage::TCUniquePointer<CQueryInstance> pInst = pQuery->f_CreateQueryInstance();
-		if (!pInst)
-			return nullptr;
-
-		if (_bTransaction)
-			mp_pMainImp->f_BeginTransaction();
-
-		auto pRes = mp_pMainImp->f_RunQuery(pInst);
-		if (!pRes)
-		{
-			if (_bTransaction)
-				mp_pMainImp->f_RollbackTransaction();
-			return nullptr;
-		}
-
-		if (_bTransaction)
-			mp_pMainImp->f_CommitTransaction();
-
-		return pRes;
-	}
-
-	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery)
-	{
-		auto pInst = _pQuery->f_CreateQueryInstance();
-		if (!pInst)
-			return nullptr;
-
-		mp_pMainImp->f_BeginTransaction();
-		auto pRes = mp_pMainImp->f_RunQuery(pInst);
-		pInst = 0;
-
-		if (!pRes)
-		{
-			mp_pMainImp->f_RollbackTransaction();
-			return nullptr;
-		}
-
-		mp_pMainImp->f_CommitTransaction();
-		return pRes;
-	}
-
-
 	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst)
 	{
 		mp_pMainImp->f_BeginTransaction();

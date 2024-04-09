@@ -229,9 +229,12 @@ namespace NMib::NSQL
 		NStorage::TCUniquePointer<CTransaction> f_CreateTransaction(NStr::CStr const& _Statements);	// Create a transaction from a list of semi-colon separated statements.
 		NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance(NStorage::TCUniquePointer<CQuery> const &_pQuery);
 
-		NStorage::TCUniquePointer<CQueryResult> f_ExecuteQuery(const NStr::CStr &_Query, bool _bTransaction = true);
+		template <typename ...tfp_CParam>
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBindWithoutTransaction(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
+		template <typename ...tfp_CParam>
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
+
 		NStorage::TCUniquePointer<CQueryResult> f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst);
-		NStorage::TCUniquePointer<CQueryResult> f_ExecuteQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery);
 
 		NStorage::TCUniquePointer<CTransactionResult> f_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction); // Blocks
 		// Async transactions
@@ -254,3 +257,4 @@ namespace NMib::NSQL
 	using namespace NMib::NSQL;
 #endif
 
+#include "Malterlib_SQL.hpp"
