@@ -233,6 +233,8 @@ namespace NMib::NSQL
 		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBindWithoutTransaction(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
 		template <typename ...tfp_CParam>
 		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
+		template <typename ...tfp_CParam>
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStorage::TCUniquePointer<CQuery> const &_pQuery, tfp_CParam const &...p_Params);
 
 		NStorage::TCUniquePointer<CQueryResult> f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst);
 
