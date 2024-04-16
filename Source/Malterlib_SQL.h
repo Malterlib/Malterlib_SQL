@@ -56,6 +56,7 @@ namespace NMib::NSQL
 
 //			virtual NMib::NStr::CStr const& f_GetString(int _iRow, int _iCol) = 0;
 		virtual NMib::NStr::CStr f_GetString(int _iRow, int _iCol) = 0;
+		virtual NMib::NStr::CStr f_GetAsString(int _iRow, int _iCol) = 0;
 		virtual int64 f_GetInt64(int _iRow, int _iCol) = 0;
 		virtual fp64 f_GetFp64(int _iRow, int _iCol) = 0;
 		virtual bool f_IsNull(int _iRow, int _iCol) = 0;
