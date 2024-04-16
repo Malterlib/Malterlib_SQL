@@ -509,13 +509,14 @@ public:
 		}
 	}
 
-	CFStr1024 f_SqlError(int _Err, const ch8 *_pError)
+	CStr f_SqlError(int _Err, CStr _Error)
 	{
-		return CFStr1024(_pError) + CFStr1024(" SQLite returned: ") + sqlite3_errmsg(mp_pDB);
+		return "{} SQLite returned: {}"_f << _Error << sqlite3_errmsg(mp_pDB);
 	}
 
 	TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query)
 	{
+		DMibSafeCheck(!_Query.f_IsEmpty(), "Empty queries are not supported");
 //		DMibDTrace("Creating sqlite query: {}\n", _Query);
 		sqlite3_stmt* pStatement = nullptr;
 
@@ -530,7 +531,7 @@ public:
 
 		if (Ret != SQLITE_OK)
 		{
-			CStr Error = f_SqlError(0, "Failed to prepare SQLite query.");
+			CStr Error = f_SqlError(0, "Failed to prepare SQLite query:\n{}\n"_f << UTF8Query);
 			DMibConOut("DB error: {}\n", Error);
 			DMibTrace("sqlite3_prepare_v2: {}\n", Error);
 			return nullptr;
