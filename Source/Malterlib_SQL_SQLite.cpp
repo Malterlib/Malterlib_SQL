@@ -509,8 +509,7 @@ public:
 		if (Ret != SQLITE_OK)
 		{
 			CStr Error = f_SqlError(0, "Failed to open SQLite DB.");
-			DMibConOut("DB error: {}\n", Error);
-			DMibTrace("sqlite3_open: {}\n", Error);
+			DMibLogWithCategory(SQLite, Error, "DB error: {}\n", Error);
 			return false;
 		}
 
@@ -552,8 +551,7 @@ public:
 		if (Ret != SQLITE_OK)
 		{
 			CStr Error = f_SqlError(0, "Failed to prepare SQLite query:\n{}\n"_f << UTF8Query);
-			DMibConOut("DB error: {}\n", Error);
-			DMibTrace("sqlite3_prepare_v2: {}\n", Error);
+			DMibLogWithCategory(SQLite, Error, "DB error: {}\n", Error);
 			return nullptr;
 		}
 

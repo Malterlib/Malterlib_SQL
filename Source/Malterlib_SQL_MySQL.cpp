@@ -340,8 +340,7 @@ public:
 			else
 			{
 				CStr Error = f_SqlError("Failed to connect.");
-				DMibConOut("Connect error: {}\n", Error);
-				DMibTrace("mysql_real_connect: {}\n", Error);
+				DMibLogWithCategory(MySQL, Error, "Connect error: {}", Error);
 
 				f_Destroy(false);
 				return false;
@@ -390,7 +389,7 @@ public:
 		if (mysql_stmt_prepare(pStatement, _Query.f_GetStr(), _Query.f_GetLen()))
 		{
 			CStr Error = f_SqlError("Failed to prepare statement.");
-			DMibConOut("Query error: {}\n", Error);
+			DMibLogWithCategory(MySQL, Error, "Query error: {}", Error);
 			return nullptr;
 		}
 
@@ -452,7 +451,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 	if (mysql_stmt_prepare(pStatement, m_pQuery->m_Query.f_GetStr(), m_pQuery->m_Query.f_GetLen()))
 	{
 		m_Error = pImp->f_StatementError(pStatement, "Failed to prepare statement.");
-		DMibConOut("Query error: {}\n", m_Error);
+		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 		return nullptr;
 	}
 
@@ -549,7 +548,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 			}
 			break;
 		default:
-			DMibConOut2("Unknown type ID: {}\n", CurParam.m_TypeID);
+			DMibLogWithCategory(MySQL, Error, "Unknown type ID: {}\n", CurParam.m_TypeID);
 			return nullptr;
 		}
 	}
@@ -559,7 +558,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		if (mysql_stmt_bind_param(pStatement, Binds.f_GetArray()))
 		{
 			m_Error = pImp->f_StatementError(pStatement, "Failed to bind params.");
-			DMibConOut("Query error: {}\n", m_Error);
+			DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 			return nullptr;
 		}
 	}
@@ -567,7 +566,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 	if (mysql_stmt_execute(pStatement))
 	{
 		m_Error = pImp->f_StatementError(pStatement, "Failed execute statement.");
-		DMibConOut("Query error: {}\n", m_Error);
+		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 		return nullptr;
 	}
 	
@@ -663,14 +662,14 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 	if (mysql_stmt_bind_result(pStatement, OutputBinds.f_GetArray()))
 	{
 		m_Error = pImp->f_StatementError(pStatement, "Failed bind result for statement.");
-		DMibConOut("Query error: {}\n", m_Error);
+		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 		return nullptr;
 	}
 
 	if (mysql_stmt_store_result(pStatement))
 	{
 		m_Error = pImp->f_StatementError(pStatement, "Failed store result for statement.");
-		DMibConOut("Query error: {}\n", m_Error);
+		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 		return nullptr;
 	}
 
@@ -687,12 +686,12 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 			break;
 		else if (Error == MYSQL_DATA_TRUNCATED)
 		{
-			DMibConOut2("SQL data truncated");
+			DMibLogWithCategory(MySQL, Error, "SQL data truncated");
 			return nullptr;
 		}
 		else if (Error == 1)
 		{
-			DMibConOut2("Error fetching statement data: {}\n", m_Error);
+			DMibLogWithCategory(MySQL, Error, "Error fetching statement data: {}", m_Error);
 			return nullptr;
 		}
 		auto &Row = pResult->m_Rows[iRow];
