@@ -22,8 +22,25 @@ using namespace NMib;
 using namespace NSQL;
 using namespace NStr;
 using namespace NContainer;
+using namespace NMisc;
 
-class CMySqlQuery;
+struct CMySqlQuery : public CQuery
+{
+	CMySqlQuery(CStr const &_Query, int _nParams)
+		: m_Query(_Query)
+		, m_nParams(_nParams)
+	{
+	}
+
+	~CMySqlQuery()
+	{
+	}
+
+	NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance() override;
+
+	CStr m_Query;
+	int m_nParams = 0;
+};
 
 class CMySqlQueryResult : public CQueryResult
 {
@@ -150,12 +167,24 @@ public:
 
 class CMySqlQueryInstance : public CQueryInstance
 {
+	struct CParam
+	{
+		mint m_ParamIndex = -1;
+		int m_TypeID = 0;
+
+		NStorage::TCVariant<CStr, uint32, int32, uint64, int64, fp64, fp32> m_Value;
+	};
+
+	TCVector<CParam> mp_Params;
+	
 public:
 	CMySqlQuery *m_pQuery;
 	CStr m_Error;
 
-	CMySqlQueryInstance()
+	CMySqlQueryInstance(CMySqlQuery *_pQuery)
+		: m_pQuery(_pQuery)
 	{
+		mp_Params.f_SetLen(m_pQuery->m_nParams);
 	}
 
 	~CMySqlQueryInstance()
@@ -166,30 +195,92 @@ public:
 
 	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
 	{
-		DMibSafeCheck(false, "Parameter binding is NOT supported for MySql currently.");
-		return false;
+		if (!mp_Params.f_IsPosValid(_iParam))
+			return false;
+
+		CParam &Param = mp_Params[_iParam];
+
+		Param.m_TypeID = _TypeID;
+
+		switch(_TypeID)
+		{
+		case 0:
+			{
+				Param.m_TypeID = 0;
+			}
+			break;
+		case TCTypeID<NTime::CTime>::ETypeID:
+			{
+				Param.m_Value = fg_GetFullTimeStr(*(NTime::CTime*)_pParam);
+				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+			}
+			break;
+		case TCTypeID<CStr>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_Value = *(CStr*)_pParam;
+			}
+			break;
+		case TCTypeID<CWStr>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_Value = *(CWStr*)_pParam;
+			}
+			break;
+
+		//case TCTypeID<float>::ETypeID:
+		//	{
+		//		Param.m_TypeID = TCTypeID<double>::ETypeID;
+		//		Param.m_NumericValue.m_DoubleVal = *(float*)_pData;
+		//	}
+		//	break;
+		//case TCTypeID<double>::ETypeID:
+		//	{
+		//		Param.m_NumericValue.m_DoubleVal = *(double*)_pData;
+		//	}
+		//	break;
+		case TCTypeID<fp32>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<fp32>::ETypeID;
+				Param.m_Value = (*(fp32*)_pParam).f_Get();
+			}
+			break;
+		case TCTypeID<fp64>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
+				Param.m_Value = (*(fp64*)_pParam).f_Get();
+			}
+			break;
+
+		case TCTypeID<int32>::ETypeID:
+			{
+				Param.m_Value = *(int32*)_pParam;
+			}
+			break;
+		case TCTypeID<uint32>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<uint32>::ETypeID;
+				Param.m_Value = *(uint32*)_pParam;
+			}
+			break;
+		case TCTypeID<int64>::ETypeID:
+			{
+				Param.m_Value = *(int64*)_pParam;
+			}
+			break;
+		case TCTypeID<uint64>::ETypeID:
+			{
+				Param.m_TypeID = TCTypeID<uint64>::ETypeID;
+				Param.m_Value = *(uint64*)_pParam;
+			}
+			break;
+		default:
+			return false;
+		}
+		return true;
 	}
 };
 
-
-class CMySqlQuery : public CQuery
-{
-public:
-	CStr m_Statement;
-	CMySqlQuery()
-	{
-	}
-	~CMySqlQuery()
-	{
-	}
-
-	virtual NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance()
-	{
-		NStorage::TCUniquePointer<CMySqlQueryInstance> pQueryInst = fg_Construct();
-		pQueryInst->m_pQuery = this;
-		return pQueryInst;
-	}
-};
 
 class CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementation
 {
@@ -248,7 +339,7 @@ public:
 			}
 			else
 			{
-				CStr Error = f_SqlError(0, "Failed to connect.");
+				CStr Error = f_SqlError("Failed to connect.");
 				DMibConOut("Connect error: {}\n", Error);
 				DMibTrace("mysql_real_connect: {}\n", Error);
 
@@ -273,7 +364,12 @@ public:
 		}
 	}
 
-	CFStr1024 f_SqlError(int _Err, const ch8 *_pError)
+	CFStr1024 f_StatementError(MYSQL_STMT *_pStatement, const ch8 *_pError)
+	{
+		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + mysql_stmt_error(_pStatement);
+	}
+
+	CFStr1024 f_SqlError(const ch8 *_pError)
 	{
 		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + mysql_error(m_pConn);
 	}
@@ -281,8 +377,27 @@ public:
 
 	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) override
 	{
-		NStorage::TCUniquePointer<CMySqlQuery> pQuery = fg_Construct();
-		pQuery->m_Statement = _Query;
+		MYSQL_STMT *pStatement = mysql_stmt_init(m_pConn);
+		if (!pStatement)
+			return nullptr;
+
+		auto Cleanup = g_OnScopeExit / [&]
+			{
+				mysql_stmt_close(pStatement);
+			}
+		;
+
+		if (mysql_stmt_prepare(pStatement, _Query.f_GetStr(), _Query.f_GetLen()))
+		{
+			CStr Error = f_SqlError("Failed to prepare statement.");
+			DMibConOut("Query error: {}\n", Error);
+			return nullptr;
+		}
+
+		int nParams = mysql_stmt_param_count(pStatement);
+
+		NStorage::TCUniquePointer<CMySqlQuery> pQuery = fg_Construct(_Query, nParams);
+
 		return pQuery;
 	}
 
@@ -314,170 +429,309 @@ CDatabaseImplementation_MySql::CMainThreadCleanup CDatabaseImplementation_MySql:
 DMibRuntimeClassNamedCasted(NMib::NSQL::CDatabaseImplementation, CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation);
 
 
+NStorage::TCUniquePointer<CQueryInstance> CMySqlQuery::f_CreateQueryInstance()
+{
+	NStorage::TCUniquePointer<CMySqlQueryInstance> pQueryInst = fg_Construct(this);
+	return pQueryInst;
+}
+
 NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp)
 {
 	CDatabaseImplementation_MySql *pImp = (CDatabaseImplementation_MySql *)_pImp;
 
-#if 0
 	MYSQL_STMT *pStatement = mysql_stmt_init(pImp->m_pConn);
-	int Err = mysql_stmt_prepare(pStatement, m_pQuery->m_Statement.f_GetCStrLossy(), m_pQuery->m_Statement.f_GetLen());
-	if (Err)
-	{
-		DMibErrorDatabase(pImp->f_SqlError(Err, "Failed to prepare statement."));
-	}
+	if (!pStatement)
+		return nullptr;
 
-	Err = mysql_stmt_execute(pStatement);
-	if (Err)
-	{
-		mysql_stmt_close(pStatement);
+	auto Cleanup = g_OnScopeExit / [&]
+		{
+			mysql_stmt_close(pStatement);
+		}
+	;
 
-		m_Error = pImp->f_SqlError(Err, "Failed to execute statement.");
+	if (mysql_stmt_prepare(pStatement, m_pQuery->m_Query.f_GetStr(), m_pQuery->m_Query.f_GetLen()))
+	{
+		m_Error = pImp->f_StatementError(pStatement, "Failed to prepare statement.");
+		DMibConOut("Query error: {}\n", m_Error);
 		return nullptr;
 	}
 
-	CMyQueryResult *pResult = DNew CMyQueryResult;
+	int nParams = mp_Params.f_GetLen();
 
-	int nParams = mysql_stmt_param_count(pStatement);
-	pResult->m_nReturedRows;
-
-	mysql_stmt_close(pStatement);
-#else
-	int Err = mysql_real_query(pImp->m_pConn, CStr(m_pQuery->m_Statement), m_pQuery->m_Statement.f_GetLen());
-	if (Err)
+	struct CBindData
 	{
-		uint32 MyErr = mysql_errno(pImp->m_pConn);
-		if (MyErr == CR_SERVER_LOST)
-			Err = mysql_real_query(pImp->m_pConn, CStr(m_pQuery->m_Statement), m_pQuery->m_Statement.f_GetLen()); // Try to reconnect
+		char m_Indicator;
+	};
 
-		if (Err)
+	TCVector<MYSQL_BIND> Binds;
+	TCVector<CBindData> BindDatas;
+
+	Binds.f_SetLen(nParams);
+	BindDatas.f_SetLen(nParams);
+	NMemory::fg_MemClear(Binds.f_GetArray(), Binds.f_GetLen() * sizeof(MYSQL_BIND));
+
+	for (int iP = 0; iP < nParams; ++iP)
+	{
+		CParam const &CurParam = mp_Params[iP];
+		auto &Bind = Binds[iP];
+		auto &BindData = BindDatas[iP];
+
+		switch(CurParam.m_TypeID)
 		{
-			m_Error = pImp->f_SqlError(Err, "Failed to execute statement.");
-			DMibConOut("Query error: {}\n", m_Error);
-			DMibTrace("mysql_real_query: {}\n", m_Error);
+		case 0:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NULL;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_NULL;
+				Bind.buffer = nullptr;
+			}
+			break;
+		case TCTypeID<CStr>::ETypeID:
+			{
+				auto &TypedParam = CurParam.m_Value.f_GetAsType<CStr>();
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_VAR_STRING;
+				Bind.buffer = (void *)TypedParam.f_GetStr();
+				Bind.buffer_length = TypedParam.f_GetLen();
+			}
+			break;
+		case TCTypeID<int32>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_LONG;
+				Bind.is_unsigned = false;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int32>();
+			}
+			break;
+		case TCTypeID<uint32>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_LONG;
+				Bind.is_unsigned = true;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint32>();
+			}
+			break;
+		case TCTypeID<int64>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_LONGLONG;
+				Bind.is_unsigned = false;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int64>();
+			}
+			break;
+		case TCTypeID<uint64>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_LONGLONG;
+				Bind.is_unsigned = true;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint64>();
+			}
+			break;
+		case TCTypeID<fp64>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_DOUBLE;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp64>();
+			}
+			break;
+		case TCTypeID<fp32>::ETypeID:
+			{
+				BindData.m_Indicator = STMT_INDICATOR_NONE;
+				Bind.u.indicator = &BindData.m_Indicator;
+				Bind.buffer_type = MYSQL_TYPE_FLOAT;
+				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp32>();
+			}
+			break;
+		default:
+			DMibConOut2("Unknown type ID: {}\n", CurParam.m_TypeID);
 			return nullptr;
 		}
 	}
 
+	if (!Binds.f_IsEmpty())
+	{
+		if (mysql_stmt_bind_param(pStatement, Binds.f_GetArray()))
+		{
+			m_Error = pImp->f_StatementError(pStatement, "Failed to bind params.");
+			DMibConOut("Query error: {}\n", m_Error);
+			return nullptr;
+		}
+	}
+
+	if (mysql_stmt_execute(pStatement))
+	{
+		m_Error = pImp->f_StatementError(pStatement, "Failed execute statement.");
+		DMibConOut("Query error: {}\n", m_Error);
+		return nullptr;
+	}
+	
 	NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
 
-	pResult->m_nAffectedRows = mysql_affected_rows(pImp->m_pConn);
-	MYSQL_RES *pRes = mysql_store_result(pImp->m_pConn);
+	auto *pMetaData = mysql_stmt_result_metadata(pStatement);
 
-	if (pRes)
+	if (!pMetaData)
 	{
-		pResult->m_nReturnedRows = mysql_num_rows(pRes);
-		pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
+		if (!mysql_stmt_field_count(pStatement))
+			pResult->m_iLastInsertedID = mysql_stmt_insert_id(pStatement);
+		else
+			DMibErrorDatabase(pImp->f_StatementError(pStatement, "Failed to produce result with mysql_stmt_result_metadata."));
 
-		int nFields = mysql_num_fields(pRes);
-		MYSQL_FIELD *pFields = mysql_fetch_fields(pRes);
-		pResult->m_Columns.f_SetLen(nFields);
-
-		for(int i = 0; i < nFields; ++i)
-		{
-			NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
-			CurCol.m_Name = pFields[i].name;
-			switch(pFields[i].type)
-			{
-			case MYSQL_TYPE_SHORT:
-			case MYSQL_TYPE_LONG:
-				{
-					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Int64;
-				}
-				break;
-			case MYSQL_TYPE_FLOAT:
-			case MYSQL_TYPE_DOUBLE:
-				{
-					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Fp64;
-				}
-				break;
-
-			case MYSQL_TYPE_VAR_STRING:
-			case MYSQL_TYPE_STRING:
-				{
-					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
-				}
-				break;
-
-			case MYSQL_TYPE_NULL:
-			case MYSQL_TYPE_TIMESTAMP:
-			case MYSQL_TYPE_LONGLONG:
-			case MYSQL_TYPE_INT24:
-			case MYSQL_TYPE_DATE:
-			case MYSQL_TYPE_TIME:
-			case MYSQL_TYPE_DATETIME:
-			case MYSQL_TYPE_YEAR:
-			case MYSQL_TYPE_NEWDATE:
-			case MYSQL_TYPE_ENUM:
-			case MYSQL_TYPE_SET:
-			case MYSQL_TYPE_TINY_BLOB:
-			case MYSQL_TYPE_MEDIUM_BLOB:
-			case MYSQL_TYPE_LONG_BLOB:
-			case MYSQL_TYPE_BLOB:
-			case MYSQL_TYPE_GEOMETRY:
-				{
-					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
-				}
-				break;
-			default:
-				{
-					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
-				}
-				break;
-			}
-			pResult->m_Columns[i].m_Name = pFields[i].name;
-		}
-		pResult->m_Rows.f_SetLen(pResult->m_nReturnedRows);
-
-		int iRow = 0;
-
-		MYSQL_ROW ppRow;
-
-		while ((ppRow = mysql_fetch_row(pRes)) && iRow < pResult->m_nReturnedRows)
-		{
-			//						unsigned long *pLengths;
-			//						pLengths = mysql_fetch_lengths(result);
-			pResult->m_Rows[iRow].m_Data.f_SetLen(nFields);
-
-			for(int i = 0; i < nFields; i++)
-			{
-				if (ppRow[i])
-				{
-					switch(pResult->m_Columns[i].m_Type)
-					{
-					case NMib::NSQL::CQueryResult::EType_Int64:
-						pResult->m_Rows[iRow].m_Data[i] = CStr(ppRow[i]).f_ToInt<int64>(0);
-						break;
-					case NMib::NSQL::CQueryResult::EType_Fp64:
-						pResult->m_Rows[iRow].m_Data[i] = CStr(ppRow[i]).f_ToFloat<fp64>(0.0);
-						break;
-					case NMib::NSQL::CQueryResult::EType_CStr:
-						pResult->m_Rows[iRow].m_Data[i] = CStr(ppRow[i]);
-						break;
-					case NMib::NSQL::CQueryResult::EType_NULL:
-						DMibNeverGetHere;
-						break;
-					}
-				}
-			}
-			++iRow;
-		}
-
-		mysql_free_result(pRes);
+		return pResult;
 	}
-	else
+
+	mint nFields = mysql_num_fields(pMetaData);
+	MYSQL_FIELD *pFields = mysql_fetch_fields(pMetaData);
+	pResult->m_Columns.f_SetLen(nFields);
+
+	struct COutputBindData
 	{
-		if(mysql_field_count(pImp->m_pConn) == 0)
+		my_bool m_bIsNull = false;
+		my_bool m_bError = false;
+		unsigned long m_Length = 0;
+		NStorage::TCVariant<CStr, int64, fp64> m_Data;
+	};
+
+	TCVector<MYSQL_BIND> OutputBinds;
+	TCVector<COutputBindData> OutputBindDatas;
+	OutputBinds.f_SetLen(nFields);
+	OutputBindDatas.f_SetLen(nFields);
+
+	NMemory::fg_MemClear(OutputBinds.f_GetArray(), OutputBinds.f_GetLen() * sizeof(MYSQL_BIND));
+
+	for (mint i = 0; i < nFields; ++i)
+	{
+		NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
+		CurCol.m_Name = pFields[i].name;
+		auto &OutputBind = OutputBinds[i];
+		auto &OutputBindData = OutputBindDatas[i];
+
+		OutputBind.is_null = &OutputBindData.m_bIsNull;
+		OutputBind.length = &OutputBindData.m_Length;
+		OutputBind.error = &OutputBindData.m_bError;
+
+		switch(pFields[i].type)
 		{
-			pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
-		}
-		else // mysql_store_result() should have returned data
-		{
-			DMibErrorDatabase(pImp->f_SqlError(Err, "Failed to produce result with mysql_store_result."));
+		case MYSQL_TYPE_SHORT:
+		case MYSQL_TYPE_LONG:
+			{
+				CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Int64;
+				OutputBind.buffer_type = MYSQL_TYPE_LONGLONG;
+				OutputBind.buffer = (void *)&(OutputBindData.m_Data = int64(0)).f_GetAsType<int64>();
+			}
+			break;
+		case MYSQL_TYPE_FLOAT:
+		case MYSQL_TYPE_DOUBLE:
+			{
+				CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Fp64;
+				OutputBind.buffer_type = MYSQL_TYPE_DOUBLE;
+				OutputBind.buffer = (void *)&(OutputBindData.m_Data = fp64(0)).f_GetAsType<fp64>();
+			}
+			break;
+
+		case MYSQL_TYPE_VAR_STRING:
+		case MYSQL_TYPE_STRING:
+		case MYSQL_TYPE_TIMESTAMP:
+		case MYSQL_TYPE_LONGLONG:
+		case MYSQL_TYPE_INT24:
+		case MYSQL_TYPE_DATE:
+		case MYSQL_TYPE_TIME:
+		case MYSQL_TYPE_DATETIME:
+		case MYSQL_TYPE_YEAR:
+		case MYSQL_TYPE_NEWDATE:
+		case MYSQL_TYPE_ENUM:
+		case MYSQL_TYPE_SET:
+		case MYSQL_TYPE_TINY_BLOB:
+		case MYSQL_TYPE_MEDIUM_BLOB:
+		case MYSQL_TYPE_LONG_BLOB:
+		case MYSQL_TYPE_BLOB:
+		case MYSQL_TYPE_GEOMETRY:
+		default:
+			CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
+			OutputBind.buffer_type = MYSQL_TYPE_VAR_STRING;
+			OutputBind.buffer = (OutputBindData.m_Data = CStr()).f_GetAsType<CStr>().f_GetStr(65536);
+			OutputBind.buffer_length = 65536;
+			break;
 		}
 	}
-#endif
 
+	if (mysql_stmt_bind_result(pStatement, OutputBinds.f_GetArray()))
+	{
+		m_Error = pImp->f_StatementError(pStatement, "Failed bind result for statement.");
+		DMibConOut("Query error: {}\n", m_Error);
+		return nullptr;
+	}
 
+	if (mysql_stmt_store_result(pStatement))
+	{
+		m_Error = pImp->f_StatementError(pStatement, "Failed store result for statement.");
+		DMibConOut("Query error: {}\n", m_Error);
+		return nullptr;
+	}
+
+	pResult->m_nReturnedRows = mysql_stmt_num_rows(pStatement);
+
+	pResult->m_Rows.f_SetLen(pResult->m_nReturnedRows);
+
+	mint iRow = 0;
+
+	while (true && iRow < mint(pResult->m_nReturnedRows))
+	{
+		auto Error = mysql_stmt_fetch(pStatement);
+		if (Error == MYSQL_NO_DATA)
+			break;
+		else if (Error == MYSQL_DATA_TRUNCATED)
+		{
+			DMibConOut2("SQL data truncated");
+			return nullptr;
+		}
+		else if (Error == 1)
+		{
+			DMibConOut2("Error fetching statement data: {}\n", m_Error);
+			return nullptr;
+		}
+		auto &Row = pResult->m_Rows[iRow];
+		Row.m_Data.f_SetLen(nFields);
+
+		for (mint i = 0; i < nFields; i++)
+		{
+			auto &BindData = OutputBindDatas[i];
+
+			if (BindData.m_bError || BindData.m_bIsNull)
+				continue;
+
+			switch(pResult->m_Columns[i].m_Type)
+			{
+			case NMib::NSQL::CQueryResult::EType_Int64:
+				Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>();
+				break;
+			case NMib::NSQL::CQueryResult::EType_Fp64:
+				Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>();
+				break;
+			case NMib::NSQL::CQueryResult::EType_CStr:
+				{
+					auto &InData = BindData.m_Data.f_GetAsType<CStr>();
+					CStr Data;
+					fg_StrCopy(Data, InData.f_GetStr(), fg_Min(65536u, BindData.m_Length));
+					Row.m_Data[i] = fg_Move(Data);
+				}
+				break;
+			case NMib::NSQL::CQueryResult::EType_NULL:
+				DMibNeverGetHere;
+				break;
+			}
+		}
+		++iRow;
+	}
+
+	pResult->m_nAffectedRows = mysql_stmt_affected_rows(pStatement);
+	pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
+	
 	return pResult;
 }
 
