@@ -68,7 +68,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 
 		Warnings_DeprecatedDeclarations false
 		{
-			!!GeneratorFamily "Xcode"
+			!!Compiler "Clang"
 		}
 
 		Warnings_DeprecatedNonPrototype false
@@ -103,6 +103,13 @@ Import "../Core/Lib_Malterlib.MTarget"
 			!!PlatformFamily "Windows"
 
 			Dependency.Type "Library"
+		}
+
+		%Dependency "Lib_mariadb-connector-c_mariadb_obj"
+		{
+			Dependency.Indirect true
+			Dependency.LinkWithObjectFiles false
+			Dependency.IndirectOrdered true
 		}
 
 		Property.MalterlibNeedLanguage_Cxx true
@@ -208,6 +215,18 @@ Property
 			!!PlatformFamily "Windows"
 		}
 		Warnings_UnusedButSetVariable false
+		{
+			!!Compiler "Clang"
+		}
+		Warnings_UnusedVariable false
+		{
+			!!Compiler "Clang"
+		}
+		Warnings_UnusedFunction false
+		{
+			!!Compiler "Clang"
+		}
+		Warnings_DeprecatedDeclarations false
 		{
 			!!Compiler "Clang"
 		}
@@ -323,11 +342,6 @@ Property
 {
 	%Dependency "Lib_Malterlib_SQL_MySQL"
 	%Dependency "Lib_Malterlib_SQL_SQLite"
-
-	%Dependency "Lib_BoringSSL_decrepit"
-	{
-		!DocumentationEnabled true
-	}
 }
 
 Property
