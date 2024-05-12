@@ -118,7 +118,7 @@ void usage(void)
   puts("Copyright 2011-2020 MariaDB Corporation AB");
   puts("Get compiler flags for using the MariaDB Connector/C.");
   printf("Usage: %s [OPTIONS]\n", mariadb_progname);
-  printf("Compiler: Clang 17.0.2\n");
+  printf("Compiler: Clang 18.1.6\n");
   while (long_options[i].name)
   {
     if (!long_options[i].has_arg)
