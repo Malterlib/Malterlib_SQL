@@ -167,7 +167,7 @@ namespace NMib::NSQL
 		if (m_bAsync)
 		{
 			m_fCallback(pResult, m_pContext);
-			delete this;
+			fg_DeleteObject(NMemory::CDefaultAllocator(), this);
 			return;
 		}
 		m_pResult = fg_Move(pResult);
@@ -194,7 +194,7 @@ namespace NMib::NSQL
 
 		for (mint i = 0; i < _nWorkerThreads; ++i)
 		{
-			CWorkerThread *pThread = DMibNew CWorkerThread(this);
+			CWorkerThread *pThread = fg_ConstructObject<CWorkerThread>(NMemory::CDefaultAllocator(), this);
 			mp_FreeThreads.f_Insert(pThread);
 		}
 		return true;
@@ -274,7 +274,7 @@ namespace NMib::NSQL
 				mp_ThreadEvent.f_Wait();
 		}
 
-		CTask *pTask = DMibNew CTask(this);
+		CTask *pTask = fg_ConstructObject<CTask>(NMemory::CDefaultAllocator(), this);
 		pTask->m_pTransaction = fg_Move(_pTransaction);
 		pTask->m_pContext = _pContext;
 		pTask->m_pEvent = _pEvent;
@@ -309,7 +309,7 @@ namespace NMib::NSQL
 				break;
 
 			pTask->m_fCallback(pTask->m_pResult, pTask->m_pContext);
-			delete pTask;
+			fg_DeleteObject(NMemory::CDefaultAllocator(), pTask);
 		}
 	}
 
@@ -365,7 +365,7 @@ namespace NMib::NSQL
 	NStorage::TCUniquePointer<CQueryInstance> const &CTransaction::f_AddQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery)
 	{
 		++m_nTransactions;
-		CQueryLink *pLink = DMibNew CQueryLink;
+		CQueryLink *pLink = fg_ConstructObject<CQueryLink>(NMemory::CDefaultAllocator());
 		pLink->m_pQueryInstance = _pQuery->f_CreateQueryInstance();
 		m_Transactions.f_Insert(pLink);
 		return pLink->m_pQueryInstance;
