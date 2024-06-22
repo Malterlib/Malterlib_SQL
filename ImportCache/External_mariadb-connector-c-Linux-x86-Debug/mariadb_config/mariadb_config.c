@@ -40,7 +40,7 @@ static char *mariadb_progname;
 #define SOCKET  "/tmp/mysql.sock"
 #define PORT "3306"
 #ifdef HAVE_TLS
-#define TLS_LIBRARY_VERSION "OpenSSL 1.1.1w"
+#define TLS_LIBRARY_VERSION "OpenSSL "
 #else
 #define TLS_LIBRARY_VERSION ""
 #endif

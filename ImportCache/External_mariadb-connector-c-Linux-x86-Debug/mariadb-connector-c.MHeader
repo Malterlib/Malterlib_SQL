@@ -5,6 +5,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	{
 		!!Compile.Type "C"
 		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
@@ -45,6 +46,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	{
 		!!Compile.Type "C"
 		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
@@ -426,6 +428,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	{
 		!!Compile.Type "C"
 		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
@@ -466,6 +469,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	{
 		!!Compile.Type "C"
 		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
@@ -553,6 +557,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	{
 		!!Compile.Type "C"
 		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
