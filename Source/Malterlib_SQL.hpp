@@ -18,23 +18,20 @@ namespace NMib::NSQL
 
 		mint iParam = 0;
 		bool bError = false;
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					if (bError)
-						return false;
+				if (bError)
+					return;
 
-					if (!pInst->f_BindParameter(iParam, p_Params))
-						bError = true;
+				if (!pInst->f_BindParameter(iParam, p_Params))
+					bError = true;
 
-					++iParam;
-
-					return false;
-				}
-				()...
+				++iParam;
 			}
-		;
+			()
+			, ...
+		);
 
 		if (bError)
 			return nullptr;
@@ -62,23 +59,20 @@ namespace NMib::NSQL
 
 		mint iParam = 0;
 		bool bError = false;
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					if (bError)
-						return false;
+				if (bError)
+					return;
 
-					if (!pInst->f_BindParameter(iParam, p_Params))
-						bError = true;
+				if (!pInst->f_BindParameter(iParam, p_Params))
+					bError = true;
 
-					++iParam;
-
-					return false;
-				}
-				()...
+				++iParam;
 			}
-		;
+			()
+			, ...
+		);
 
 		if (bError)
 			return nullptr;
@@ -110,23 +104,20 @@ namespace NMib::NSQL
 
 		mint iParam = 0;
 		bool bError = false;
-		TCInitializerList<bool> Dummy =
+		(
+			[&]
 			{
-				[&]
-				{
-					if (bError)
-						return false;
+				if (bError)
+					return;
 
-					if (!pInst->f_BindParameter(iParam, p_Params))
-						bError = true;
+				if (!pInst->f_BindParameter(iParam, p_Params))
+					bError = true;
 
-					++iParam;
-
-					return false;
-				}
-				()...
+				++iParam;
 			}
-		;
+			()
+			, ...
+		);
 
 		if (bError)
 			return nullptr;
