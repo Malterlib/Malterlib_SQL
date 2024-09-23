@@ -61,7 +61,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 		Analyzer false
 		PrefixHeader undefined
 
-		Warnings "Minimal"
+		Warnings "Off"
 		{
 			!!GeneratorFamily "VisualStudio"
 		}
@@ -81,7 +81,12 @@ Import "../Core/Lib_Malterlib.MTarget"
 			!!Compiler "Clang"
 		}
 
-		PreprocessorDefines += ["LIBMARIADB", "HAVE_COMPRESS", "THREAD"]
+		Warnings_UnusedButSetVariable false
+		{
+			!!Compiler "Clang"
+		}		
+
+		PreprocessorDefines += ["LIBMARIADB", "HAVE_COMPRESS", "THREAD", "HAVE_THREAD_LOCAL=1"]
 
 		PreprocessorDefines += ["_XOPEN_SOURCE=700", "_DARWIN_C_SOURCE"]
 		{
