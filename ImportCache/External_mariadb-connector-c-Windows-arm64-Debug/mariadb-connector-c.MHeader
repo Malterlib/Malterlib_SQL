@@ -1,4 +1,106 @@
 Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())`->MakeAbsolute()
+%Target "Dll_mariadb-connector-c_auth_gssapi_client"
+{
+	Compile
+	{
+		!!Compile.Type "WindowsResource"
+		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
+			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute()
+		]
+		PreprocessorDefines += [
+			"HAVE_DLOPEN",
+			"HAVE_SCHANNEL",
+			"HAVE_TLS",
+			"HAVE_WINCRYPT",
+			"MARIADB_MACHINE_TYPE=\"arm64\"",
+			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
+			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
+			"_CRT_SECURE_NO_WARNINGS",
+			"auth_gssapi_client_EXPORTS"
+		]
+	}
+	Compile
+	{
+		!!Compile.Type "C"
+		SearchPath += [
+			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
+			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
+			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/compress`->MakeAbsolute()
+		]
+		PreprocessorDefines += [
+			"HAVE_DLOPEN",
+			"HAVE_SCHANNEL",
+			"HAVE_TLS",
+			"HAVE_WINCRYPT",
+			"MARIADB_MACHINE_TYPE=\"arm64\"",
+			"MARIADB_SYSTEM_TYPE=\"Windows\"",
+			"NOGDI",
+			"WIN32_LEAN_AND_MEAN",
+			"_CRT_NONSTDC_NO_DEPRECATE",
+			"_CRT_SECURE_NO_WARNINGS",
+			"auth_gssapi_client_EXPORTS"
+		]
+	}
+	Property.MalterlibTargetNameType "Normal"
+	Compile.AllowNonExisting true
+	Target.Group "External/mariadb-connector-c"
+	{
+		!!Target.Group undefined
+	}
+	Target.Type "DynamicLibrary"
+	Target.BaseName "mariadb-connector-c_auth_gssapi_client"
+	Target.BaseFileName "auth_gssapi_client"
+	%Group "plugins"
+	{
+		%Group "auth"
+		{
+			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/auth_gssapi_client.c`
+			{
+				Compile.Type "C"
+			}
+			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/sspi_client.c`
+			{
+				Compile.Type "C"
+			}
+			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/sspi_errmsg.c`
+			{
+				Compile.Type "C"
+			}
+		}
+		%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/plugin.def`
+		{
+			Compile.Disabled true
+		}
+	}
+	%Group "Windows"
+	{
+		%Group "arm64"
+		{
+			%Group `@(FullConfiguration)`
+			{
+				%Group "win"
+				{
+					%File `@('.'->MakeAbsolute())/win/auth_gssapi_client.rc`
+					{
+						Compile.Type "WindowsResource"
+					}
+				}
+			}
+		}
+	}
+}
 %Target "Dll_mariadb-connector-c_pvio_shmem"
 {
 	Compile

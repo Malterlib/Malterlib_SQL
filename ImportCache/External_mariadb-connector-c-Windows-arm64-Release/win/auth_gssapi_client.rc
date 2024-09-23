@@ -23,7 +23,7 @@ BEGIN
             VALUE "LegalCopyright", "2013-2018 MariaDB Corporation Ab"
             VALUE "ProductName", "MariaDB Connector/C"
             VALUE "ProductVersion", "3.4.1"
-            VALUE "OriginalFilename", "pvio_shmem.dll"
+            VALUE "OriginalFilename", "auth_gssapi_client.dll"
         END
     END
     BLOCK "VarFileInfo"
