@@ -17,6 +17,7 @@ Import "../Core/Lib_Malterlib.MTarget"
 	Repository
 	{
 		Type "External"
+		DefaultUpstreamBranch "3.4"
 		Remotes [{Name: "upstream", URL: "https://github.com/mariadb-corporation/mariadb-connector-c.git"}]
 	}
 }
