@@ -572,9 +572,9 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 	
 	NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
 
-	auto *pMetaData = mysql_stmt_result_metadata(pStatement);
+	auto *pMetadata = mysql_stmt_result_metadata(pStatement);
 
-	if (!pMetaData)
+	if (!pMetadata)
 	{
 		if (!mysql_stmt_field_count(pStatement))
 			pResult->m_iLastInsertedID = mysql_stmt_insert_id(pStatement);
@@ -584,8 +584,8 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		return pResult;
 	}
 
-	mint nFields = mysql_num_fields(pMetaData);
-	MYSQL_FIELD *pFields = mysql_fetch_fields(pMetaData);
+	mint nFields = mysql_num_fields(pMetadata);
+	MYSQL_FIELD *pFields = mysql_fetch_fields(pMetadata);
 	pResult->m_Columns.f_SetLen(nFields);
 
 	struct COutputBindData
