@@ -43,10 +43,8 @@ public:
 
 class CSQLiteQueryResult : public CQueryResult
 {
-
 public:
-
-	typedef NMib::NStorage::TCVariant<int64, fp64, CStr> CValue;
+	using CValue = NMib::NStorage::TCVariant<int64, fp64, CStr>;
 
 	struct CRow
 	{

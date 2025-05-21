@@ -124,7 +124,7 @@ namespace NMib::NSQL
 		};
 
 		DMibListLinkD_List(CQueryLink, m_Link) m_Transactions;
-		typedef DMibListLinkD_Iter(CQueryLink, m_Link) CQueryIter;
+		using CQueryIter = DMibListLinkD_Iter(CQueryLink, m_Link);
 		int m_nTransactions;
 		bool m_bAllowFail;
 		NContainer::TCVector<NStorage::TCUniquePointer<CQuery>> m_OwnedQueries;
@@ -135,7 +135,7 @@ namespace NMib::NSQL
 		void f_SetAllowFail(bool _bAllow);
 	};
 
-	typedef void (FTransactionResultCallback)(NStorage::TCUniquePointer<CTransactionResult> const &_pResult, void *_pContext);
+	using FTransactionResultCallback = void (NStorage::TCUniquePointer<CTransactionResult> const &_pResult, void *_pContext);
 
 	class CDatabaseImplementation
 	{
@@ -185,8 +185,8 @@ namespace NMib::NSQL
 
 		NThread::CMutual mp_QueueLock;
 		DMibListLinkD_List(CTask, m_Link) mp_QueuedTasks;
-		typedef DMibListLinkD_Iter(CTask, m_Link) CTaskIter;
 
+		using CTaskIter = DMibListLinkD_Iter(CTask, m_Link);
 
 		void fp_QueueTask(CTask *_pTask);
 
