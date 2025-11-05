@@ -115,13 +115,31 @@ Import "../Core/Lib_Malterlib.MTarget"
 		}
 	}
 
+	%Target "Lib_mariadb-connector-c_mariadb_obj"
+	{
+		Property
+		{
+			// .cfi_escape used in inline assembly doesn't work without this
+			MalterlibDebugSymbolsEnable true
+		}
+	}
+
 	%Target "Lib_mariadb-connector-c_mariadbclient"
 	{
+		Property
+		{
+			MalterlibNeedLanguage_Cxx true
+		}
+
 		%Dependency ["shlwapi.lib", "Secur32.lib", "Bcrypt.lib"]
 		{
 			!!PlatformFamily "Windows"
 
-			Dependency.Type "Library"
+			Dependency
+			{
+				Type "Library"
+				Indirect true
+			}
 		}
 
 		%Dependency "Lib_mariadb-connector-c_mariadb_obj"
@@ -130,8 +148,6 @@ Import "../Core/Lib_Malterlib.MTarget"
 			Dependency.LinkWithObjectFiles false
 			Dependency.IndirectOrdered true
 		}
-
-		Property.MalterlibNeedLanguage_Cxx true
 	}
 
 	Target
