@@ -81,12 +81,12 @@ struct st_client_plugin_int *plugin_list[MYSQL_CLIENT_MAX_PLUGINS + MARIADB_CLIE
 static pthread_mutex_t LOCK_load_client_plugin;
 #endif
 
- extern struct st_mysql_client_plugin mysql_native_password_client_plugin;
- extern struct st_mysql_client_plugin client_ed25519_client_plugin;
- extern struct st_mysql_client_plugin caching_sha2_password_client_plugin;
- extern struct st_mysql_client_plugin sha256_password_client_plugin;
- extern struct st_mysql_client_plugin zlib_client_plugin;
- extern struct st_mysql_client_plugin pvio_socket_client_plugin;
+ extern struct st_mysql_client_plugin_AUTH mysql_native_password_client_plugin;
+ extern struct st_mysql_client_plugin_AUTH client_ed25519_client_plugin;
+ extern struct st_mysql_client_plugin_AUTH caching_sha2_password_client_plugin;
+ extern struct st_mysql_client_plugin_AUTH sha256_password_client_plugin;
+ extern struct st_mysql_client_plugin_COMPRESSION zlib_client_plugin;
+ extern struct st_mysql_client_plugin_PVIO pvio_socket_client_plugin;
 
 
 struct st_mysql_client_plugin *mysql_client_builtins[]=
@@ -149,7 +149,11 @@ static struct st_mysql_client_plugin *find_plugin(const char *name, int type)
     return 0;
 
   if (!name)
-    return plugin_list[plugin_nr]->plugin;
+  {
+    if (plugin_list[plugin_nr])
+      return plugin_list[plugin_nr]->plugin;
+    return NULL;
+  }
 
   for (p= plugin_list[plugin_nr]; p; p= p->next)
   {
@@ -255,6 +259,12 @@ static void load_env_plugins(MYSQL *mysql)
   free_env= strdup(s);
   plugs= s= free_env;
 
+  if (!free_env)
+  {
+    SET_CLIENT_ERROR(mysql, CR_OUT_OF_MEMORY, SQLSTATE_UNKNOWN, 0);
+    return;
+  }
+
   do {
     if ((s= strchr(plugs, ';')))
       *s= '\0';
@@ -310,7 +320,7 @@ int mysql_client_plugin_init()
 /**
   Deinitializes the client plugin layer.
 
-  Unloades all client plugins and frees any associated resources.
+  Unloads all client plugins and frees any associated resources.
 */
 
 void mysql_client_plugin_deinit()
