@@ -39,6 +39,6 @@
 #endif
 
 /* Source information */
-#define CC_SOURCE_REVISION "2b7647bfc2f35ba340db8b3f195a46a4631f265a"
+#define CC_SOURCE_REVISION "751a9ddce09c848304bec731d10444917d1f43f4"
 
 #endif /* _mariadb_version_h_ */
