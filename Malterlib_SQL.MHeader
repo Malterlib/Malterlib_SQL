@@ -352,6 +352,7 @@ Property
 						, BuildSystemBasePath
 						, Builtin.MToolExe
 					)
+					UnicodeBOM false
 				}
 			}
 		}
