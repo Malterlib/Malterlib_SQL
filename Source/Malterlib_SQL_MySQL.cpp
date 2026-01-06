@@ -174,7 +174,7 @@ class CMySqlQueryInstance : public CQueryInstance
 	};
 
 	TCVector<CParam> mp_Params;
-	
+
 public:
 	CMySqlQuery *m_pQuery;
 	CStr m_Error;
@@ -567,7 +567,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 		return nullptr;
 	}
-	
+
 	NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
 
 	auto *pMetadata = mysql_stmt_result_metadata(pStatement);
@@ -728,7 +728,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 	pResult->m_nAffectedRows = mysql_stmt_affected_rows(pStatement);
 	pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
-	
+
 	return pResult;
 }
 

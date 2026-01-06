@@ -11,7 +11,7 @@ namespace NMib::NSQL
 		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
 		if (!pQuery)
 			return nullptr;
- 
+
 		NStorage::TCUniquePointer<CQueryInstance> pInst = pQuery->f_CreateQueryInstance();
 		if (!pInst)
 			return nullptr;
@@ -97,7 +97,7 @@ namespace NMib::NSQL
 		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
 		if (!pQuery)
 			return nullptr;
- 
+
 		NStorage::TCUniquePointer<CQueryInstance> pInst = pQuery->f_CreateQueryInstance();
 		if (!pInst)
 			return nullptr;
