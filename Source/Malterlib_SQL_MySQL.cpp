@@ -328,6 +328,39 @@ public:
 			CStr Password = _Parameters.f_GetValue("Password", "");
 			CStr Database = _Parameters.f_GetValue("Database", "");
 			int Port = _Parameters.f_GetValue("Port", "0").f_ToInt();
+
+			// SSL options - paths to certificate files
+			CStr CertificateAuthority = _Parameters.f_GetValue("CertificateAuthority", "");
+			CStr CertificateKey = _Parameters.f_GetValue("CertificateKey", "");
+			CStr CertificateCert = _Parameters.f_GetValue("CertificateCert", "");
+
+			// Set SSL CA certificate path if provided
+			if (!CertificateAuthority.f_IsEmpty())
+			{
+				if (mysql_options(m_pConn, MYSQL_OPT_SSL_CA, CertificateAuthority.f_GetStr()) != 0)
+				{
+					DMibLogWithCategory(MySQL, Error, "Failed to set SSL CA option");
+				}
+			}
+
+			// Set SSL client key path if provided
+			if (!CertificateKey.f_IsEmpty())
+			{
+				if (mysql_options(m_pConn, MYSQL_OPT_SSL_KEY, CertificateKey.f_GetStr()) != 0)
+				{
+					DMibLogWithCategory(MySQL, Error, "Failed to set SSL KEY option");
+				}
+			}
+
+			// Set SSL client certificate path if provided
+			if (!CertificateCert.f_IsEmpty())
+			{
+				if (mysql_options(m_pConn, MYSQL_OPT_SSL_CERT, CertificateCert.f_GetStr()) != 0)
+				{
+					DMibLogWithCategory(MySQL, Error, "Failed to set SSL CERT option");
+				}
+			}
+
 			MYSQL *pSQL = mysql_real_connect(m_pConn, Host!=""?Host.f_GetStr():nullptr, User!=""?User.f_GetStr():nullptr, Password!=""?Password.f_GetStr():nullptr, Database!=""?Database.f_GetStr():nullptr, Port, nullptr, 0);
 
 			if (pSQL)
