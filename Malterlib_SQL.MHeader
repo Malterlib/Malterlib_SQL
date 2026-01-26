@@ -54,7 +54,6 @@ Import "../Core/Lib_Malterlib.MTarget"
 		&
 		{
 			PlatformFamily "Linux"
-			!HostPlatformFamily "Linux"
 		}
 	}
 
