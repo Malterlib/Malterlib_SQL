@@ -605,6 +605,13 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 	auto *pMetadata = mysql_stmt_result_metadata(pStatement);
 
+	auto CleanupMetadata = g_OnScopeExit / [&]
+		{
+			if (pMetadata)
+				mysql_free_result(pMetadata);
+		}
+	;
+
 	if (!pMetadata)
 	{
 		if (!mysql_stmt_field_count(pStatement))
