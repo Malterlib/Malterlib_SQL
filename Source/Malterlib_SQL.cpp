@@ -31,7 +31,7 @@ namespace NMib::NSQL
 
 	CQueryResult *CTransactionResult::f_GetQueryResult(aint _iQuery)
 	{
-		if (_iQuery < 0 || (mint)_iQuery >= m_Results.f_GetLen())
+		if (_iQuery < 0 || (umint)_iQuery >= m_Results.f_GetLen())
 			return nullptr;
 		return m_Results[_iQuery].f_Get();
 	}
@@ -175,7 +175,7 @@ namespace NMib::NSQL
 		//_pImp->f_CreateQuery()
 	}
 
-	bool CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreads)
+	bool CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, umint _nWorkerThreads)
 	{
 		if (mp_pMainImp)
 		{
@@ -192,7 +192,7 @@ namespace NMib::NSQL
 		if (!mp_pMainImp->f_Create(mp_Parameters))
 			return false;
 
-		for (mint i = 0; i < _nWorkerThreads; ++i)
+		for (umint i = 0; i < _nWorkerThreads; ++i)
 		{
 			CWorkerThread *pThread = fg_ConstructObject<CWorkerThread>(NMemory::CDefaultAllocator(), this);
 			mp_FreeThreads.f_Insert(pThread);

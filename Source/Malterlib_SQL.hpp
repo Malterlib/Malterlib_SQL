@@ -16,7 +16,7 @@ namespace NMib::NSQL
 		if (!pInst)
 			return nullptr;
 
-		mint iParam = 0;
+		umint iParam = 0;
 		bool bError = false;
 		(
 			[&]
@@ -57,7 +57,7 @@ namespace NMib::NSQL
 		if (!pInst)
 			return nullptr;
 
-		mint iParam = 0;
+		umint iParam = 0;
 		bool bError = false;
 		(
 			[&]
@@ -102,7 +102,7 @@ namespace NMib::NSQL
 		if (!pInst)
 			return nullptr;
 
-		mint iParam = 0;
+		umint iParam = 0;
 		bool bError = false;
 		(
 			[&]

@@ -175,7 +175,7 @@ private:
 
 	struct CParam
 	{
-		mint m_ParamIndex;
+		umint m_ParamIndex;
 
 		int m_TypeID;
 		CStr m_StrValue;

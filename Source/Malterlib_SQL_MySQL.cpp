@@ -167,7 +167,7 @@ class CMySqlQueryInstance : public CQueryInstance
 {
 	struct CParam
 	{
-		mint m_ParamIndex = -1;
+		umint m_ParamIndex = -1;
 		int m_TypeID = 0;
 
 		NStorage::TCVariant<CStr, uint32, int32, uint64, int64, fp64, fp32> m_Value;
@@ -622,7 +622,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		return pResult;
 	}
 
-	mint nFields = mysql_num_fields(pMetadata);
+	umint nFields = mysql_num_fields(pMetadata);
 	MYSQL_FIELD *pFields = mysql_fetch_fields(pMetadata);
 	pResult->m_Columns.f_SetLen(nFields);
 
@@ -641,7 +641,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 	NMemory::fg_MemClear(OutputBinds.f_GetArray(), OutputBinds.f_GetLen() * sizeof(MYSQL_BIND));
 
-	for (mint i = 0; i < nFields; ++i)
+	for (umint i = 0; i < nFields; ++i)
 	{
 		NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
 		CurCol.m_Name = pFields[i].name;
@@ -715,9 +715,9 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 	pResult->m_Rows.f_SetLen(pResult->m_nReturnedRows);
 
-	mint iRow = 0;
+	umint iRow = 0;
 
-	while (true && iRow < mint(pResult->m_nReturnedRows))
+	while (true && iRow < umint(pResult->m_nReturnedRows))
 	{
 		auto Error = mysql_stmt_fetch(pStatement);
 		if (Error == MYSQL_NO_DATA)
@@ -735,7 +735,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		auto &Row = pResult->m_Rows[iRow];
 		Row.m_Data.f_SetLen(nFields);
 
-		for (mint i = 0; i < nFields; i++)
+		for (umint i = 0; i < nFields; i++)
 		{
 			auto &BindData = OutputBindDatas[i];
 

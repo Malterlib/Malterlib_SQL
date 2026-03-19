@@ -221,7 +221,7 @@ namespace NMib::NSQL
 		CSQLConnection();
 		~CSQLConnection();
 
-		bool f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, mint _nWorkerThreadss);
+		bool f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, umint _nWorkerThreadss);
 
 		void f_Close();
 
