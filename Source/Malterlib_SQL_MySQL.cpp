@@ -365,6 +365,11 @@ public:
 		CStr CertificateAuthority = m_Parameters.f_GetValue("CertificateAuthority", "");
 		CStr CertificateKey = m_Parameters.f_GetValue("CertificateKey", "");
 		CStr CertificateCert = m_Parameters.f_GetValue("CertificateCert", "");
+		bool bAllowNonTLS = m_Parameters.f_GetValue("AllowNonTLS", "false") == "true";
+		my_bool bEnforceTLS = bAllowNonTLS ? 0 : 1;
+
+		if (mysql_options(pConn, MYSQL_OPT_SSL_ENFORCE, &bEnforceTLS) != 0)
+			DMibLogWithCategory(MySQL, Error, "Failed to set SSL ENFORCE option");
 
 		if (!CertificateAuthority.f_IsEmpty())
 		{
