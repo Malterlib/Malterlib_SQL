@@ -313,76 +313,116 @@ public:
 	};
 	static CMainThreadCleanup ms_MainThreadCleanup;
 
-	MYSQL m_Conn;
-	MYSQL *m_pConn;
+	MYSQL *m_pConn = nullptr;
+	CRegistry m_Parameters;
+	bool m_bTransactionActive = false;
+	bool m_bExecutedStatementInTransaction = false;
+
+	static CFStr1024 fsp_SqlError(MYSQL *_pConn, const ch8 *_pError)
+	{
+		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + (_pConn ? mysql_error(_pConn) : "No active connection");
+	}
+
+	static bool fsp_IsRecoverableConnectionError(unsigned int _ErrorCode)
+	{
+		switch (_ErrorCode)
+		{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_LOST:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	bool fp_OpenConnection()
+	{
+		if (m_pConn)
+		{
+			mysql_close(m_pConn);
+			m_pConn = nullptr;
+		}
+
+		MYSQL *pConn = mysql_init(nullptr);
+		ms_MainThreadCleanup.m_bDoneInit = true;
+
+		if (!pConn)
+			return false;
+
+		auto Cleanup = g_OnScopeExit / [&]
+			{
+				if (pConn)
+					mysql_close(pConn);
+			}
+		;
+
+		CStr Host = m_Parameters.f_GetValue("Host", "");
+		CStr User = m_Parameters.f_GetValue("User", "");
+		CStr Password = m_Parameters.f_GetValue("Password", "");
+		CStr Database = m_Parameters.f_GetValue("Database", "");
+		int Port = m_Parameters.f_GetValue("Port", "0").f_ToInt();
+
+		CStr CertificateAuthority = m_Parameters.f_GetValue("CertificateAuthority", "");
+		CStr CertificateKey = m_Parameters.f_GetValue("CertificateKey", "");
+		CStr CertificateCert = m_Parameters.f_GetValue("CertificateCert", "");
+
+		if (!CertificateAuthority.f_IsEmpty())
+		{
+			if (mysql_options(pConn, MYSQL_OPT_SSL_CA, CertificateAuthority.f_GetStr()) != 0)
+				DMibLogWithCategory(MySQL, Error, "Failed to set SSL CA option");
+		}
+
+		if (!CertificateKey.f_IsEmpty())
+		{
+			if (mysql_options(pConn, MYSQL_OPT_SSL_KEY, CertificateKey.f_GetStr()) != 0)
+				DMibLogWithCategory(MySQL, Error, "Failed to set SSL KEY option");
+		}
+
+		if (!CertificateCert.f_IsEmpty())
+		{
+			if (mysql_options(pConn, MYSQL_OPT_SSL_CERT, CertificateCert.f_GetStr()) != 0)
+				DMibLogWithCategory(MySQL, Error, "Failed to set SSL CERT option");
+		}
+
+		MYSQL *pSQL = mysql_real_connect(pConn, Host != "" ? Host.f_GetStr() : nullptr, User != "" ? User.f_GetStr() : nullptr, Password != "" ? Password.f_GetStr() : nullptr, Database != "" ? Database.f_GetStr() : nullptr, Port, nullptr, 0);
+
+		if (!pSQL)
+		{
+			DMibLogWithCategory(MySQL, Error, "Connect error: {}", fsp_SqlError(pConn, "Failed to connect."));
+			return false;
+		}
+
+		mysql_autocommit(pSQL, 0);
+		m_pConn = pSQL;
+		pConn = nullptr;
+		return true;
+	}
+
+	bool fp_TryReconnectAfterConnectionLoss(unsigned int _ErrorCode, const ch8 *_pOperation)
+	{
+		if (!fsp_IsRecoverableConnectionError(_ErrorCode))
+			return false;
+
+		if (m_bTransactionActive && m_bExecutedStatementInTransaction)
+			return false;
+
+		DMibLogWithCategory(MySQL, Warning, "{}. Reconnecting MySQL session and retrying once.", _pOperation);
+		return fp_OpenConnection();
+	}
 
 	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters) override
 	{
-        m_pConn = mysql_init(&m_Conn);
-		ms_MainThreadCleanup.m_bDoneInit = true;
-
-		if (m_pConn)
-		{
-			CStr Host = _Parameters.f_GetValue("Host", "");
-			CStr User = _Parameters.f_GetValue("User", "");
-			CStr Password = _Parameters.f_GetValue("Password", "");
-			CStr Database = _Parameters.f_GetValue("Database", "");
-			int Port = _Parameters.f_GetValue("Port", "0").f_ToInt();
-
-			// SSL options - paths to certificate files
-			CStr CertificateAuthority = _Parameters.f_GetValue("CertificateAuthority", "");
-			CStr CertificateKey = _Parameters.f_GetValue("CertificateKey", "");
-			CStr CertificateCert = _Parameters.f_GetValue("CertificateCert", "");
-
-			// Set SSL CA certificate path if provided
-			if (!CertificateAuthority.f_IsEmpty())
-			{
-				if (mysql_options(m_pConn, MYSQL_OPT_SSL_CA, CertificateAuthority.f_GetStr()) != 0)
-				{
-					DMibLogWithCategory(MySQL, Error, "Failed to set SSL CA option");
-				}
-			}
-
-			// Set SSL client key path if provided
-			if (!CertificateKey.f_IsEmpty())
-			{
-				if (mysql_options(m_pConn, MYSQL_OPT_SSL_KEY, CertificateKey.f_GetStr()) != 0)
-				{
-					DMibLogWithCategory(MySQL, Error, "Failed to set SSL KEY option");
-				}
-			}
-
-			// Set SSL client certificate path if provided
-			if (!CertificateCert.f_IsEmpty())
-			{
-				if (mysql_options(m_pConn, MYSQL_OPT_SSL_CERT, CertificateCert.f_GetStr()) != 0)
-				{
-					DMibLogWithCategory(MySQL, Error, "Failed to set SSL CERT option");
-				}
-			}
-
-			MYSQL *pSQL = mysql_real_connect(m_pConn, Host!=""?Host.f_GetStr():nullptr, User!=""?User.f_GetStr():nullptr, Password!=""?Password.f_GetStr():nullptr, Database!=""?Database.f_GetStr():nullptr, Port, nullptr, 0);
-
-			if (pSQL)
-			{
-				mysql_autocommit(pSQL, 0);
-				return true;
-			}
-			else
-			{
-				CStr Error = f_SqlError("Failed to connect.");
-				DMibLogWithCategory(MySQL, Error, "Connect error: {}", Error);
-
-				f_Destroy(false);
-				return false;
-			}
-		}
-		else
-			return false;
+		m_Parameters = _Parameters;
+		m_bTransactionActive = false;
+		m_bExecutedStatementInTransaction = false;
+		return fp_OpenConnection();
 	}
 
 	virtual void f_Destroy(bool _bDestroyThread) override
 	{
+		m_bTransactionActive = false;
+		m_bExecutedStatementInTransaction = false;
+
 		if (m_pConn)
 		{
 			mysql_close(m_pConn);
@@ -401,55 +441,80 @@ public:
 
 	CFStr1024 f_SqlError(const ch8 *_pError)
 	{
-		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + mysql_error(m_pConn);
+		return fsp_SqlError(m_pConn, _pError);
 	}
 
 
 	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) override
 	{
-		MYSQL_STMT *pStatement = mysql_stmt_init(m_pConn);
-		if (!pStatement)
-			return nullptr;
-
-		auto Cleanup = g_OnScopeExit / [&]
-			{
-				mysql_stmt_close(pStatement);
-			}
-		;
-
-		if (mysql_stmt_prepare(pStatement, _Query.f_GetStr(), _Query.f_GetLen()))
+		for (int iAttempt = 0; iAttempt < 2; ++iAttempt)
 		{
-			CStr Error = f_SqlError("Failed to prepare statement.");
-			DMibLogWithCategory(MySQL, Error, "Query error: {}", Error);
-			return nullptr;
+			if (!m_pConn && !fp_OpenConnection())
+				return nullptr;
+
+			MYSQL_STMT *pStatement = mysql_stmt_init(m_pConn);
+			if (!pStatement)
+				return nullptr;
+
+			auto Cleanup = g_OnScopeExit / [&]
+				{
+					mysql_stmt_close(pStatement);
+				}
+			;
+
+			if (mysql_stmt_prepare(pStatement, _Query.f_GetStr(), _Query.f_GetLen()))
+			{
+				if (iAttempt == 0 && fp_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing query"))
+					continue;
+
+				CStr Error = f_StatementError(pStatement, "Failed to prepare statement.");
+				DMibLogWithCategory(MySQL, Error, "Query error: {}", Error);
+				return nullptr;
+			}
+
+			int nParams = mysql_stmt_param_count(pStatement);
+
+			NStorage::TCUniquePointer<CMySqlQuery> pQuery = fg_Construct(_Query, nParams);
+
+			return pQuery;
 		}
 
-		int nParams = mysql_stmt_param_count(pStatement);
-
-		NStorage::TCUniquePointer<CMySqlQuery> pQuery = fg_Construct(_Query, nParams);
-
-		return pQuery;
+		return nullptr;
 	}
 
 	void f_BeginTransaction() override
 	{
+		m_bTransactionActive = true;
+		m_bExecutedStatementInTransaction = false;
 	}
 
 	NStorage::TCUniquePointer<CQueryResult> f_RunQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQuery) override
 	{
 		CMySqlQueryInstance *pInstance = (CMySqlQueryInstance *)_pQuery.f_Get();
 
-		return pInstance->f_Execute(this);
+		auto pResult = pInstance->f_Execute(this);
+		if (pResult && m_bTransactionActive)
+			m_bExecutedStatementInTransaction = true;
+
+		return pResult;
 	}
 
 	void f_CommitTransaction() override
 	{
-		mysql_commit(m_pConn);
+		if (m_pConn)
+			mysql_commit(m_pConn);
+
+		m_bTransactionActive = false;
+		m_bExecutedStatementInTransaction = false;
 	}
 
 	void f_RollbackTransaction() override
 	{
-		mysql_rollback(m_pConn);
+		if (m_pConn)
+			mysql_rollback(m_pConn);
+
+		m_bTransactionActive = false;
+		m_bExecutedStatementInTransaction = false;
 	}
 
 };
@@ -469,307 +534,318 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 {
 	CDatabaseImplementation_MySql *pImp = (CDatabaseImplementation_MySql *)_pImp;
 
-	MYSQL_STMT *pStatement = mysql_stmt_init(pImp->m_pConn);
-	if (!pStatement)
-		return nullptr;
-
-	auto Cleanup = g_OnScopeExit / [&]
-		{
-			mysql_stmt_close(pStatement);
-		}
-	;
-
-	if (mysql_stmt_prepare(pStatement, m_pQuery->m_Query.f_GetStr(), m_pQuery->m_Query.f_GetLen()))
+	for (int iAttempt = 0; iAttempt < 2; ++iAttempt)
 	{
-		m_Error = pImp->f_StatementError(pStatement, "Failed to prepare statement.");
-		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
-		return nullptr;
-	}
-
-	int nParams = mp_Params.f_GetLen();
-
-	struct CBindData
-	{
-		char m_Indicator;
-	};
-
-	TCVector<MYSQL_BIND> Binds;
-	TCVector<CBindData> BindDatas;
-
-	Binds.f_SetLen(nParams);
-	BindDatas.f_SetLen(nParams);
-	NMemory::fg_MemClear(Binds.f_GetArray(), Binds.f_GetLen() * sizeof(MYSQL_BIND));
-
-	for (int iP = 0; iP < nParams; ++iP)
-	{
-		CParam const &CurParam = mp_Params[iP];
-		auto &Bind = Binds[iP];
-		auto &BindData = BindDatas[iP];
-
-		switch(CurParam.m_TypeID)
-		{
-		case 0:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NULL;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_NULL;
-				Bind.buffer = nullptr;
-			}
-			break;
-		case TCTypeID<CStr>::ETypeID:
-			{
-				auto &TypedParam = CurParam.m_Value.f_GetAsType<CStr>();
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_VAR_STRING;
-				Bind.buffer = (void *)TypedParam.f_GetStr();
-				Bind.buffer_length = TypedParam.f_GetLen();
-			}
-			break;
-		case TCTypeID<int32>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_LONG;
-				Bind.is_unsigned = false;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int32>();
-			}
-			break;
-		case TCTypeID<uint32>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_LONG;
-				Bind.is_unsigned = true;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint32>();
-			}
-			break;
-		case TCTypeID<int64>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_LONGLONG;
-				Bind.is_unsigned = false;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int64>();
-			}
-			break;
-		case TCTypeID<uint64>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_LONGLONG;
-				Bind.is_unsigned = true;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint64>();
-			}
-			break;
-		case TCTypeID<fp64>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_DOUBLE;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp64>();
-			}
-			break;
-		case TCTypeID<fp32>::ETypeID:
-			{
-				BindData.m_Indicator = STMT_INDICATOR_NONE;
-				Bind.u.indicator = &BindData.m_Indicator;
-				Bind.buffer_type = MYSQL_TYPE_FLOAT;
-				Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp32>();
-			}
-			break;
-		default:
-			DMibLogWithCategory(MySQL, Error, "Unknown type ID: {}\n", CurParam.m_TypeID);
+		if (!pImp->m_pConn && !pImp->fp_OpenConnection())
 			return nullptr;
-		}
-	}
 
-	if (!Binds.f_IsEmpty())
-	{
-		if (mysql_stmt_bind_param(pStatement, Binds.f_GetArray()))
+		MYSQL_STMT *pStatement = mysql_stmt_init(pImp->m_pConn);
+		if (!pStatement)
+			return nullptr;
+
+		auto Cleanup = g_OnScopeExit / [&]
+			{
+				mysql_stmt_close(pStatement);
+			}
+		;
+
+		if (mysql_stmt_prepare(pStatement, m_pQuery->m_Query.f_GetStr(), m_pQuery->m_Query.f_GetLen()))
 		{
-			m_Error = pImp->f_StatementError(pStatement, "Failed to bind params.");
+			if (iAttempt == 0 && pImp->fp_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing statement"))
+				continue;
+
+			m_Error = pImp->f_StatementError(pStatement, "Failed to prepare statement.");
 			DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
 			return nullptr;
 		}
-	}
 
-	if (mysql_stmt_execute(pStatement))
-	{
-		m_Error = pImp->f_StatementError(pStatement, "Failed execute statement.");
-		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
-		return nullptr;
-	}
+		int nParams = mp_Params.f_GetLen();
 
-	NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
-
-	auto *pMetadata = mysql_stmt_result_metadata(pStatement);
-
-	auto CleanupMetadata = g_OnScopeExit / [&]
+		struct CBindData
 		{
-			if (pMetadata)
-				mysql_free_result(pMetadata);
-		}
-	;
+			char m_Indicator;
+		};
 
-	if (!pMetadata)
-	{
-		if (!mysql_stmt_field_count(pStatement))
-			pResult->m_iLastInsertedID = mysql_stmt_insert_id(pStatement);
-		else
-			DMibErrorDatabase(pImp->f_StatementError(pStatement, "Failed to produce result with mysql_stmt_result_metadata."));
+		TCVector<MYSQL_BIND> Binds;
+		TCVector<CBindData> BindDatas;
+
+		Binds.f_SetLen(nParams);
+		BindDatas.f_SetLen(nParams);
+		NMemory::fg_MemClear(Binds.f_GetArray(), Binds.f_GetLen() * sizeof(MYSQL_BIND));
+
+		for (int iP = 0; iP < nParams; ++iP)
+		{
+			CParam const &CurParam = mp_Params[iP];
+			auto &Bind = Binds[iP];
+			auto &BindData = BindDatas[iP];
+
+			switch(CurParam.m_TypeID)
+			{
+			case 0:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NULL;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_NULL;
+					Bind.buffer = nullptr;
+				}
+				break;
+			case TCTypeID<CStr>::ETypeID:
+				{
+					auto &TypedParam = CurParam.m_Value.f_GetAsType<CStr>();
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_VAR_STRING;
+					Bind.buffer = (void *)TypedParam.f_GetStr();
+					Bind.buffer_length = TypedParam.f_GetLen();
+				}
+				break;
+			case TCTypeID<int32>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_LONG;
+					Bind.is_unsigned = false;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int32>();
+				}
+				break;
+			case TCTypeID<uint32>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_LONG;
+					Bind.is_unsigned = true;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint32>();
+				}
+				break;
+			case TCTypeID<int64>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_LONGLONG;
+					Bind.is_unsigned = false;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int64>();
+				}
+				break;
+			case TCTypeID<uint64>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_LONGLONG;
+					Bind.is_unsigned = true;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint64>();
+				}
+				break;
+			case TCTypeID<fp64>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_DOUBLE;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp64>();
+				}
+				break;
+			case TCTypeID<fp32>::ETypeID:
+				{
+					BindData.m_Indicator = STMT_INDICATOR_NONE;
+					Bind.u.indicator = &BindData.m_Indicator;
+					Bind.buffer_type = MYSQL_TYPE_FLOAT;
+					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp32>();
+				}
+				break;
+			default:
+				DMibLogWithCategory(MySQL, Error, "Unknown type ID: {}\n", CurParam.m_TypeID);
+				return nullptr;
+			}
+		}
+
+		if (!Binds.f_IsEmpty())
+		{
+			if (mysql_stmt_bind_param(pStatement, Binds.f_GetArray()))
+			{
+				m_Error = pImp->f_StatementError(pStatement, "Failed to bind params.");
+				DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
+				return nullptr;
+			}
+		}
+
+		if (mysql_stmt_execute(pStatement))
+		{
+			m_Error = pImp->f_StatementError(pStatement, "Failed execute statement.");
+			DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
+			return nullptr;
+		}
+
+		NStorage::TCUniquePointer<CMySqlQueryResult> pResult = fg_Construct();
+
+		auto *pMetadata = mysql_stmt_result_metadata(pStatement);
+
+		auto CleanupMetadata = g_OnScopeExit / [&]
+			{
+				if (pMetadata)
+					mysql_free_result(pMetadata);
+			}
+		;
+
+		if (!pMetadata)
+		{
+			if (!mysql_stmt_field_count(pStatement))
+				pResult->m_iLastInsertedID = mysql_stmt_insert_id(pStatement);
+			else
+				DMibErrorDatabase(pImp->f_StatementError(pStatement, "Failed to produce result with mysql_stmt_result_metadata."));
+
+			return pResult;
+		}
+
+		mint nFields = mysql_num_fields(pMetadata);
+		MYSQL_FIELD *pFields = mysql_fetch_fields(pMetadata);
+		pResult->m_Columns.f_SetLen(nFields);
+
+		struct COutputBindData
+		{
+			my_bool m_bIsNull = false;
+			my_bool m_bError = false;
+			unsigned long m_Length = 0;
+			NStorage::TCVariant<CStr, int64, fp64> m_Data;
+		};
+
+		TCVector<MYSQL_BIND> OutputBinds;
+		TCVector<COutputBindData> OutputBindDatas;
+		OutputBinds.f_SetLen(nFields);
+		OutputBindDatas.f_SetLen(nFields);
+
+		NMemory::fg_MemClear(OutputBinds.f_GetArray(), OutputBinds.f_GetLen() * sizeof(MYSQL_BIND));
+
+		for (mint i = 0; i < nFields; ++i)
+		{
+			NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
+			CurCol.m_Name = pFields[i].name;
+			auto &OutputBind = OutputBinds[i];
+			auto &OutputBindData = OutputBindDatas[i];
+
+			OutputBind.is_null = &OutputBindData.m_bIsNull;
+			OutputBind.length = &OutputBindData.m_Length;
+			OutputBind.error = &OutputBindData.m_bError;
+
+			switch(pFields[i].type)
+			{
+			case MYSQL_TYPE_SHORT:
+			case MYSQL_TYPE_LONG:
+				{
+					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Int64;
+					OutputBind.buffer_type = MYSQL_TYPE_LONGLONG;
+					OutputBind.buffer = (void *)&(OutputBindData.m_Data = int64(0)).f_GetAsType<int64>();
+				}
+				break;
+			case MYSQL_TYPE_FLOAT:
+			case MYSQL_TYPE_DOUBLE:
+				{
+					CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Fp64;
+					OutputBind.buffer_type = MYSQL_TYPE_DOUBLE;
+					OutputBind.buffer = (void *)&(OutputBindData.m_Data = fp64(0)).f_GetAsType<fp64>();
+				}
+				break;
+
+			case MYSQL_TYPE_VAR_STRING:
+			case MYSQL_TYPE_STRING:
+			case MYSQL_TYPE_TIMESTAMP:
+			case MYSQL_TYPE_LONGLONG:
+			case MYSQL_TYPE_INT24:
+			case MYSQL_TYPE_DATE:
+			case MYSQL_TYPE_TIME:
+			case MYSQL_TYPE_DATETIME:
+			case MYSQL_TYPE_YEAR:
+			case MYSQL_TYPE_NEWDATE:
+			case MYSQL_TYPE_ENUM:
+			case MYSQL_TYPE_SET:
+			case MYSQL_TYPE_TINY_BLOB:
+			case MYSQL_TYPE_MEDIUM_BLOB:
+			case MYSQL_TYPE_LONG_BLOB:
+			case MYSQL_TYPE_BLOB:
+			case MYSQL_TYPE_GEOMETRY:
+			default:
+				CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
+				OutputBind.buffer_type = MYSQL_TYPE_VAR_STRING;
+				OutputBind.buffer = (OutputBindData.m_Data = CStr()).f_GetAsType<CStr>().f_GetStr(65536);
+				OutputBind.buffer_length = 65536;
+				break;
+			}
+		}
+
+		if (mysql_stmt_bind_result(pStatement, OutputBinds.f_GetArray()))
+		{
+			m_Error = pImp->f_StatementError(pStatement, "Failed bind result for statement.");
+			DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
+			return nullptr;
+		}
+
+		if (mysql_stmt_store_result(pStatement))
+		{
+			m_Error = pImp->f_StatementError(pStatement, "Failed store result for statement.");
+			DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
+			return nullptr;
+		}
+
+		pResult->m_nReturnedRows = mysql_stmt_num_rows(pStatement);
+
+		pResult->m_Rows.f_SetLen(pResult->m_nReturnedRows);
+
+		mint iRow = 0;
+
+		while (true && iRow < mint(pResult->m_nReturnedRows))
+		{
+			auto Error = mysql_stmt_fetch(pStatement);
+			if (Error == MYSQL_NO_DATA)
+				break;
+			else if (Error == MYSQL_DATA_TRUNCATED)
+			{
+				DMibLogWithCategory(MySQL, Error, "SQL data truncated");
+				return nullptr;
+			}
+			else if (Error == 1)
+			{
+				DMibLogWithCategory(MySQL, Error, "Error fetching statement data: {}", m_Error);
+				return nullptr;
+			}
+			auto &Row = pResult->m_Rows[iRow];
+			Row.m_Data.f_SetLen(nFields);
+
+			for (mint i = 0; i < nFields; i++)
+			{
+				auto &BindData = OutputBindDatas[i];
+
+				if (BindData.m_bError || BindData.m_bIsNull)
+					continue;
+
+				switch(pResult->m_Columns[i].m_Type)
+				{
+				case NMib::NSQL::CQueryResult::EType_Int64:
+					Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>();
+					break;
+				case NMib::NSQL::CQueryResult::EType_Fp64:
+					Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>();
+					break;
+				case NMib::NSQL::CQueryResult::EType_CStr:
+					{
+						auto &InData = BindData.m_Data.f_GetAsType<CStr>();
+						CStr Data;
+						fg_StrCopy(Data, InData.f_GetStr(), fg_Min(65536u, BindData.m_Length));
+						Row.m_Data[i] = fg_Move(Data);
+					}
+					break;
+				case NMib::NSQL::CQueryResult::EType_NULL:
+					DMibNeverGetHere;
+					break;
+				}
+			}
+			++iRow;
+		}
+
+		pResult->m_nAffectedRows = mysql_stmt_affected_rows(pStatement);
+		pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
 
 		return pResult;
 	}
 
-	mint nFields = mysql_num_fields(pMetadata);
-	MYSQL_FIELD *pFields = mysql_fetch_fields(pMetadata);
-	pResult->m_Columns.f_SetLen(nFields);
-
-	struct COutputBindData
-	{
-		my_bool m_bIsNull = false;
-		my_bool m_bError = false;
-		unsigned long m_Length = 0;
-		NStorage::TCVariant<CStr, int64, fp64> m_Data;
-	};
-
-	TCVector<MYSQL_BIND> OutputBinds;
-	TCVector<COutputBindData> OutputBindDatas;
-	OutputBinds.f_SetLen(nFields);
-	OutputBindDatas.f_SetLen(nFields);
-
-	NMemory::fg_MemClear(OutputBinds.f_GetArray(), OutputBinds.f_GetLen() * sizeof(MYSQL_BIND));
-
-	for (mint i = 0; i < nFields; ++i)
-	{
-		NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
-		CurCol.m_Name = pFields[i].name;
-		auto &OutputBind = OutputBinds[i];
-		auto &OutputBindData = OutputBindDatas[i];
-
-		OutputBind.is_null = &OutputBindData.m_bIsNull;
-		OutputBind.length = &OutputBindData.m_Length;
-		OutputBind.error = &OutputBindData.m_bError;
-
-		switch(pFields[i].type)
-		{
-		case MYSQL_TYPE_SHORT:
-		case MYSQL_TYPE_LONG:
-			{
-				CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Int64;
-				OutputBind.buffer_type = MYSQL_TYPE_LONGLONG;
-				OutputBind.buffer = (void *)&(OutputBindData.m_Data = int64(0)).f_GetAsType<int64>();
-			}
-			break;
-		case MYSQL_TYPE_FLOAT:
-		case MYSQL_TYPE_DOUBLE:
-			{
-				CurCol.m_Type = NMib::NSQL::CQueryResult::EType_Fp64;
-				OutputBind.buffer_type = MYSQL_TYPE_DOUBLE;
-				OutputBind.buffer = (void *)&(OutputBindData.m_Data = fp64(0)).f_GetAsType<fp64>();
-			}
-			break;
-
-		case MYSQL_TYPE_VAR_STRING:
-		case MYSQL_TYPE_STRING:
-		case MYSQL_TYPE_TIMESTAMP:
-		case MYSQL_TYPE_LONGLONG:
-		case MYSQL_TYPE_INT24:
-		case MYSQL_TYPE_DATE:
-		case MYSQL_TYPE_TIME:
-		case MYSQL_TYPE_DATETIME:
-		case MYSQL_TYPE_YEAR:
-		case MYSQL_TYPE_NEWDATE:
-		case MYSQL_TYPE_ENUM:
-		case MYSQL_TYPE_SET:
-		case MYSQL_TYPE_TINY_BLOB:
-		case MYSQL_TYPE_MEDIUM_BLOB:
-		case MYSQL_TYPE_LONG_BLOB:
-		case MYSQL_TYPE_BLOB:
-		case MYSQL_TYPE_GEOMETRY:
-		default:
-			CurCol.m_Type = NMib::NSQL::CQueryResult::EType_CStr;
-			OutputBind.buffer_type = MYSQL_TYPE_VAR_STRING;
-			OutputBind.buffer = (OutputBindData.m_Data = CStr()).f_GetAsType<CStr>().f_GetStr(65536);
-			OutputBind.buffer_length = 65536;
-			break;
-		}
-	}
-
-	if (mysql_stmt_bind_result(pStatement, OutputBinds.f_GetArray()))
-	{
-		m_Error = pImp->f_StatementError(pStatement, "Failed bind result for statement.");
-		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
-		return nullptr;
-	}
-
-	if (mysql_stmt_store_result(pStatement))
-	{
-		m_Error = pImp->f_StatementError(pStatement, "Failed store result for statement.");
-		DMibLogWithCategory(MySQL, Error, "Query error: {}", m_Error);
-		return nullptr;
-	}
-
-	pResult->m_nReturnedRows = mysql_stmt_num_rows(pStatement);
-
-	pResult->m_Rows.f_SetLen(pResult->m_nReturnedRows);
-
-	mint iRow = 0;
-
-	while (true && iRow < mint(pResult->m_nReturnedRows))
-	{
-		auto Error = mysql_stmt_fetch(pStatement);
-		if (Error == MYSQL_NO_DATA)
-			break;
-		else if (Error == MYSQL_DATA_TRUNCATED)
-		{
-			DMibLogWithCategory(MySQL, Error, "SQL data truncated");
-			return nullptr;
-		}
-		else if (Error == 1)
-		{
-			DMibLogWithCategory(MySQL, Error, "Error fetching statement data: {}", m_Error);
-			return nullptr;
-		}
-		auto &Row = pResult->m_Rows[iRow];
-		Row.m_Data.f_SetLen(nFields);
-
-		for (mint i = 0; i < nFields; i++)
-		{
-			auto &BindData = OutputBindDatas[i];
-
-			if (BindData.m_bError || BindData.m_bIsNull)
-				continue;
-
-			switch(pResult->m_Columns[i].m_Type)
-			{
-			case NMib::NSQL::CQueryResult::EType_Int64:
-				Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>();
-				break;
-			case NMib::NSQL::CQueryResult::EType_Fp64:
-				Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>();
-				break;
-			case NMib::NSQL::CQueryResult::EType_CStr:
-				{
-					auto &InData = BindData.m_Data.f_GetAsType<CStr>();
-					CStr Data;
-					fg_StrCopy(Data, InData.f_GetStr(), fg_Min(65536u, BindData.m_Length));
-					Row.m_Data[i] = fg_Move(Data);
-				}
-				break;
-			case NMib::NSQL::CQueryResult::EType_NULL:
-				DMibNeverGetHere;
-				break;
-			}
-		}
-		++iRow;
-	}
-
-	pResult->m_nAffectedRows = mysql_stmt_affected_rows(pStatement);
-	pResult->m_iLastInsertedID = mysql_insert_id(pImp->m_pConn);
-
-	return pResult;
+	return nullptr;
 }
 
 void fg_Malterlib_SQL_MySql_MakeActive()
