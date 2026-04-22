@@ -227,7 +227,7 @@ end:
   }
   if (!p || !p[0])
   {
-    strncpy(installation_dir, "../../../../../Binaries/MalterlibSDK/Linux/x86/Linux.sdk/usr/local", PATH_MAX - 1);
+    strncpy(installation_dir, "../../../../../Binaries/MalterlibSDK/Linux/Debian/x86/Linux.sdk/usr/local", PATH_MAX - 1);
     return;
   }
 }

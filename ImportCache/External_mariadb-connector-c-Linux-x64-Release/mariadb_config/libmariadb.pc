@@ -15,6 +15,6 @@ Version: 3.4.7
 Description: MariaDB Connector/C dynamic library
 Cflags: -I${includedir}
 Libs: -L${libdir} -lmariadb
-Libs.private: -lc -ldl -lm -lpthread
+Libs.private: -lc -ldl -lm
 
 

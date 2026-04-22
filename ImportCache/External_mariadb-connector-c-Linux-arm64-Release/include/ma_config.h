@@ -35,8 +35,8 @@
  * function definitions - processed in LibmysqlFunctions.txt 
  */
 
-/* #undef HAVE_DLERROR */
-/* #undef HAVE_DLOPEN */
+#define HAVE_DLERROR 1
+#define HAVE_DLOPEN 1
 #define HAVE_GETPWUID 1
 #define HAVE_MEMCPY 1
 #define HAVE_POLL 1

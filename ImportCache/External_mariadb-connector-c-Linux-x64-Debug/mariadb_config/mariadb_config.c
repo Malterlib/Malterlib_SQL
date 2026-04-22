@@ -32,7 +32,7 @@ static char *mariadb_progname;
 
 #define INCLUDE "-I%s/include/mariadb -I%s/include/mariadb/mysql"
 #define LIBS    "-L%s/lib/mariadb/ -lmariadb"
-#define LIBS_SYS "-lc -ldl -lm -lpthread"
+#define LIBS_SYS "-lc -ldl -lm"
 #define CFLAGS  INCLUDE
 #define VERSION "10.8.8"
 #define CC_VERSION "3.4.7"
@@ -49,7 +49,7 @@ static char *mariadb_progname;
 #define PKG_LIBDIR "%s/lib/mariadb"
 
 #ifdef HAVE_EMBEDDED
-#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -lc -ldl -lm -lpthread"
+#define EMBEDDED_LIBS "-L/usr/local/lib/mariadb/ -lmariadbd -lc -ldl -lm"
 #endif
 
 #if defined(SOLARIS) || defined(__sun)
@@ -227,7 +227,7 @@ end:
   }
   if (!p || !p[0])
   {
-    strncpy(installation_dir, "../../../../../Binaries/MalterlibSDK/Linux/x64/Linux.sdk/usr/local", PATH_MAX - 1);
+    strncpy(installation_dir, "../../../../../Binaries/MalterlibSDK/Linux/Ubuntu/x64/Linux.sdk/usr/local", PATH_MAX - 1);
     return;
   }
 }
