@@ -30,6 +30,9 @@ Repository
 				]
 			}
 		]
+		{
+			!!MalterlibAddUpstreams true
+		}
 	}
 }
 
@@ -40,6 +43,9 @@ Repository
 		Type "External"
 		DefaultUpstreamBranch "3.4"
 		Remotes [{Name: "upstream", URL: "https://github.com/mariadb-corporation/mariadb-connector-c.git"}]
+		{
+			!!MalterlibAddUpstreams true
+		}
 	}
 }
 
