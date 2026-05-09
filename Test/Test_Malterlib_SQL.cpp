@@ -32,6 +32,12 @@ namespace
 			TCUniquePointer<NMib::NSQL::CQueryResult> pResults = SQLConn.f_ExecuteBind("CREATE TABLE TestTable (P_Id INTEGER, Name TEXT, PRIMARY KEY (P_Id) )");
 			DMibTest(DMibExpr(pResults)) (ETest_FailAndStop);
 
+			// Exercise the non-transactional bind helper (a public legacy CSQLConnection API): it runs the query
+			// directly without wrapping it in a transaction. The table is still empty here, so it returns no rows.
+			TCUniquePointer<NMib::NSQL::CQueryResult> pDirectResults = SQLConn.f_ExecuteBindWithoutTransaction("SELECT * FROM TestTable");
+			DMibTest(DMibExpr(pDirectResults)) (ETest_FailAndStop);
+			DMibTest(DMibExpr(pDirectResults->f_NumReturnedRows()) == DMibExpr(0)) (ETest_FailAndStop);
+
 			// Test INSERT
 			for (int i= 0; i < 100; ++i)
 			{
@@ -107,7 +113,11 @@ namespace
 
 				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne))) (ETest_FailAndStop);
 
-				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo = (_Flags & EFlag_MySqlSyntax) ? SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, 'Failure')") : SQLConn.f_CreateQuery("INSERT OR FAIL INTO TestTable VALUES (500, 'Failure')");
+				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo =
+					(_Flags & EFlag_MySqlSyntax)
+					? SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, 'Failure')")
+					: SQLConn.f_CreateQuery("INSERT OR FAIL INTO TestTable VALUES (500, 'Failure')")
+				;
 				DMibTest(DMibExpr(pQueryTwo)) (ETest_FailAndStop);
 
 				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo))) (ETest_FailAndStop);
@@ -138,7 +148,11 @@ namespace
 				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne))) (ETest_FailAndStop);
 
 
-				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo = (_Flags & EFlag_MySqlSyntax) ? SQLConn.f_CreateQuery("REPLACE INTO TestTable VALUES (500, 'Success')") : SQLConn.f_CreateQuery("INSERT OR REPLACE INTO TestTable VALUES (500, 'Success')");
+				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo =
+					(_Flags & EFlag_MySqlSyntax)
+					? SQLConn.f_CreateQuery("REPLACE INTO TestTable VALUES (500, 'Success')")
+					: SQLConn.f_CreateQuery("INSERT OR REPLACE INTO TestTable VALUES (500, 'Success')")
+				;
 				DMibTest(DMibExpr(pQueryTwo)) (ETest_FailAndStop);
 
 				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo))) (ETest_FailAndStop);

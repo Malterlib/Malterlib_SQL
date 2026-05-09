@@ -10,6 +10,51 @@ using namespace NMib::NStorage;
 namespace NMib::NSQL
 {
 	DMibImpErrorClassImplement(CExceptionDatabase);
+	DMibImpErrorClassImplement(CExceptionSql);
+
+	CSqlErrorData fg_SqlErrorData
+		(
+			ESqlErrorCategory _Category
+			, ESqlErrorRetryClass _RetryClass
+			, NStr::CStr _Backend
+			, NStr::CStr _BackendCode
+			, NStr::CStr _BackendMessage
+			, NStr::CStr _Detail
+			, NStr::CStr _Hint
+		)
+	{
+		CSqlErrorData Error;
+		Error.m_Category = _Category;
+		Error.m_RetryClass = _RetryClass;
+		Error.m_Backend = fg_Move(_Backend);
+		Error.m_BackendCode = fg_Move(_BackendCode);
+		Error.m_BackendMessage = fg_Move(_BackendMessage);
+		Error.m_Detail = fg_Move(_Detail);
+		Error.m_Hint = fg_Move(_Hint);
+
+		return Error;
+	}
+
+	bool fg_SqlErrorIsTransient(CSqlErrorData const &_Error)
+	{
+		return _Error.m_RetryClass != ESqlErrorRetryClass::mc_Permanent;
+	}
+
+	NStorage::TCOptional<CSqlErrorData> fg_TryGetSqlErrorData(NException::CExceptionPointer const &_pException)
+	{
+		NStorage::TCOptional<CSqlErrorData> Error;
+		NException::fg_VisitException<CExceptionSql>
+			(
+				_pException
+				, [&](CExceptionSql const &_Exception)
+				{
+					Error = _Exception.f_GetSpecific();
+				}
+			)
+		;
+
+		return Error;
+	}
 
 	CQuery::CQuery()
 	{

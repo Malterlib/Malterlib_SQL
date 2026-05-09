@@ -5,6 +5,7 @@
 
 #include <Mib/Core/Core>
 #include <Mib/Container/Registry>
+#include <Mib/Storage/Optional>
 
 namespace NMib::NSQL
 {
@@ -15,6 +16,61 @@ namespace NMib::NSQL
 	DMibImpErrorClassDefine(CExceptionDatabase, NException::CException);
 
 #	define DMibErrorDatabase(d_Description) DMibImpError(NMib::NSQL::CExceptionDatabase, d_Description)
+#	define DMibErrorDatabaseInstance(d_Description) DMibImpErrorInstance(NMib::NSQL::CExceptionDatabase, d_Description)
+
+	enum class ESqlErrorCategory : uint8
+	{
+		mc_Generic
+		, mc_ConstraintViolation
+		, mc_DuplicateKey
+		, mc_ForeignKeyViolation
+		, mc_MissingRow
+		, mc_TooManyRows
+		, mc_Deadlock
+		, mc_SerializationFailure
+		, mc_ConnectionLoss
+		, mc_MigrationError
+	};
+
+	enum class ESqlErrorRetryClass : uint8
+	{
+		mc_Permanent
+		, mc_RetryTransaction
+		, mc_RetryConnection
+	};
+
+	struct CSqlErrorData
+	{
+		template <typename tf_CStream>
+		void f_Stream(tf_CStream &_Stream);
+
+		ESqlErrorCategory m_Category = ESqlErrorCategory::mc_Generic;
+		ESqlErrorRetryClass m_RetryClass = ESqlErrorRetryClass::mc_Permanent;
+		NStr::CStr m_Backend;
+		NStr::CStr m_BackendCode;
+		NStr::CStr m_BackendMessage;
+		NStr::CStr m_Detail;
+		NStr::CStr m_Hint;
+	};
+
+	DMibImpErrorSpecificClassDefine(CExceptionSql, CExceptionDatabase, CSqlErrorData);
+
+#	define DMibErrorSql(d_Description, d_Specific) DMibImpErrorSpecific(NMib::NSQL::CExceptionSql, d_Description, d_Specific)
+#	define DMibErrorSqlInstance(d_Description, d_Specific) DMibImpExceptionInstanceSpecific(NMib::NSQL::CExceptionSql, d_Description, d_Specific)
+
+	CSqlErrorData fg_SqlErrorData
+		(
+			ESqlErrorCategory _Category
+			, ESqlErrorRetryClass _RetryClass = ESqlErrorRetryClass::mc_Permanent
+			, NStr::CStr _Backend = {}
+			, NStr::CStr _BackendCode = {}
+			, NStr::CStr _BackendMessage = {}
+			, NStr::CStr _Detail = {}
+			, NStr::CStr _Hint = {}
+		)
+	;
+	bool fg_SqlErrorIsTransient(CSqlErrorData const &_Error);
+	NStorage::TCOptional<CSqlErrorData> fg_TryGetSqlErrorData(NException::CExceptionPointer const &_pException);
 
 #	ifndef DMibPNoShortCuts
 #		define DErrorDatabase DMibErrorDatabase
@@ -32,6 +88,19 @@ namespace NMib::NSQL
 	//	virtual bool f_Next() = 0;
 	//	virtual bool f_OK() = 0;
 	//};
+
+	enum class ESqlTransactionIsolation : uint8
+	{
+		mc_Default
+		, mc_ReadCommitted
+		, mc_RepeatableRead
+		, mc_Serializable
+	};
+
+	struct CSqlTransactionSettings
+	{
+		ESqlTransactionIsolation m_Isolation = ESqlTransactionIsolation::mc_Default;
+	};
 
 
 	class CQueryResult
