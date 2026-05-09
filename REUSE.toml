@@ -11,3 +11,9 @@ path = "SourceGenerated/SQLite/**"
 precedence = "override"
 SPDX-FileCopyrightText = "NONE"
 SPDX-License-Identifier = "blessing"
+
+[[annotations]]
+path = "SourceGenerated/PostgreSQL/**"
+precedence = "override"
+SPDX-FileCopyrightText = "PostgreSQL Global Development Group"
+SPDX-License-Identifier = "PostgreSQL"

@@ -13,6 +13,11 @@ Repository
 			, CopyrightText: "NONE"
 			, LicenseIdentifier: "blessing"
 			, Precedence: "override"
+		}, {
+			Path: ["SourceGenerated/PostgreSQL/*"]
+			, CopyrightText: "PostgreSQL Global Development Group"
+			, LicenseIdentifier: "PostgreSQL"
+			, Precedence: "override"
 		}
 	]
 }
@@ -194,6 +199,13 @@ Property
 {
 	%Group "SQL"
 	{
+		Property
+		{
+			ExcludeFiles =+ "*/Malterlib_SQL_MySQL.cpp"
+			ExcludeFiles =+ "*/Malterlib_SQL_SQLite.cpp"
+			// The SQLite initialization belongs to Lib_Malterlib_SQL_SQLite, which must link without the main SQL library
+			ExcludeFiles =+ "*/Malterlib_SQL_SQLite_Init.cpp"
+		}
 		%Group "Include"
 		{
 			Compile.Type "C++"
@@ -202,11 +214,42 @@ Property
 			}
 			%File "Include/Mib/SQL/^*"
 		}
-		%File "Source/Malterlib_SQL.*"
+		%File "Source/Malterlib_SQL*"
+		%Group "PostgresClient"
+		{
+			%File "Source/PostgresClient/Malterlib_SQL_PostgresClient*"
+		}
+		%Group "PostgresDatabase"
+		{
+			%File "Source/PostgresDatabase/Malterlib_SQL_PostgresDatabase*"
+		}
+		%Group "SQLiteDatabase"
+		{
+			%File "Source/SQLiteDatabase/Malterlib_SQL_SQLiteDatabase*"
+		}
 		%Group "Documentation"
 		{
 			%File "Documentation/*"
 		}
+	}
+
+	%Dependency "Lib_Malterlib_SQL_SQLite"
+	{
+		Dependency.Indirect true
+	}
+	// The PostgreSQL client and the async database front end pull in the actor framework, sockets and TLS, so a
+	// separate-library build of Lib_Malterlib_SQL must link these or it hits unresolved symbols.
+	%Dependency "Lib_Malterlib_Concurrency"
+	{
+		Dependency.Indirect true
+	}
+	%Dependency "Lib_Malterlib_Network"
+	{
+		Dependency.Indirect true
+	}
+	%Dependency "Lib_Malterlib_Cryptography"
+	{
+		Dependency.Indirect true
 	}
 }
 
@@ -297,6 +340,7 @@ Property
 	%Group "SQL_SQLite"
 	{
 		%File "Source/Malterlib_SQL_SQLite.cpp"
+		%File "Source/Malterlib_SQL_SQLite_Init.cpp"
 		Property
 		{
 			ScriptFile: string = "Tools/Malterlib_SQL_SQLite_GenerateAmalgation.sh"->MakeAbsolute()
