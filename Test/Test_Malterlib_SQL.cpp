@@ -34,6 +34,10 @@ namespace
 		TCUniquePointer<NMib::NSQL::CQueryResult> pResults = SQLConn.f_ExecuteBind("CREATE TABLE TestTable (P_Id INTEGER, Name TEXT, PRIMARY KEY (P_Id) )");
 		DMibTest(DMibExpr(pResults))(ETest_FailAndStop);
 
+		TCUniquePointer<NMib::NSQL::CQueryResult> pDirectResults = SQLConn.f_ExecuteBindWithoutTransaction("SELECT * FROM TestTable");
+		DMibTest(DMibExpr(pDirectResults))(ETest_FailAndStop);
+		DMibTest(DMibExpr(pDirectResults->f_NumReturnedRows()) == DMibExpr(0))(ETest_FailAndStop);
+
 		// Test INSERT
 		for (int iRow = 0; iRow < 100; ++iRow)
 		{

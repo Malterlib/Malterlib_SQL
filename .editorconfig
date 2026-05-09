@@ -85,6 +85,14 @@ indent_size = unset
 tab_width = unset
 max_line_length = unset
 
+# PostgreSQL's Unicode normalization and stringprep tables, as upstream generates and writes them.
+[SourceGenerated/PostgreSQL/**]
+malterlib_format = unset
+indent_style = unset
+indent_size = unset
+tab_width = unset
+max_line_length = unset
+
 # Generated license metadata retains the generator's formatting.
 [REUSE.toml]
 malterlib_format = unset

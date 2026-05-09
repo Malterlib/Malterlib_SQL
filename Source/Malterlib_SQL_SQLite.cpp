@@ -9,6 +9,7 @@
 #	include <windows.h>
 #endif
 
+#include "Malterlib_SQL_SQLite_Init.h"
 #include "../SourceGenerated/SQLite/sqlite3.h"
 
 using namespace NMib;
@@ -522,6 +523,8 @@ CDatabaseImplementation_SQLite::~CDatabaseImplementation_SQLite()
 bool CDatabaseImplementation_SQLite::f_Create(NMib::NContainer::CRegistry const &_Parameters)
 {
 	DMibCheck(!mp_pDB);
+
+	NMib::NSQL::NPrivate::fg_SqliteEnsureInitialized();
 
 	int Ret;
 	CStr DBFile = _Parameters.f_GetValue("Database", "");
