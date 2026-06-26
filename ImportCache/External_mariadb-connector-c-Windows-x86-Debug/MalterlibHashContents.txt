@@ -229,16 +229,16 @@ Import.CMake_Config: Debug
 Import.CMake_Variables: [
 	CMAKE_TRY_COMPILE_PLATFORM_VARIABLES=CMAKE_CXX_COMPILER_TARGET;CMAKE_C_COMPILER_TARGET;CMAKE_CXX_FLAGS;CMAKE_C_FLAGS;CMAKE_SYSTEM_NAME;CMAKE_SYSTEM_PROCESSOR,
 	CMAKE_OBJECT_PATH_MAX=4096,
-	CMAKE_C_FLAGS_INIT=--target=arm64-windows-msvc,
-	CMAKE_CXX_FLAGS_INIT=--target=arm64-windows-msvc,
+	CMAKE_C_FLAGS_INIT=--target=i386-windows-msvc,
+	CMAKE_CXX_FLAGS_INIT=--target=i386-windows-msvc,
 	,
 	OPENSSL_ROOT_DIR=/External/boringssl,
 	OPENSSL_INCLUDE_DIR=/External/boringssl/include,
-	OPENSSL_LIBRARIES=/lib/arm64/delayimp.lib,
-	OPENSSL_CRYPTO_LIBRARY=/lib/arm64/delayimp.lib,
-	OPENSSL_CRYPTO_LIBRARIES=/lib/arm64/delayimp.lib,
-	OPENSSL_SSL_LIBRARY=/lib/arm64/delayimp.lib,
-	OPENSSL_SSL_LIBRARIES=/lib/arm64/delayimp.lib,
+	OPENSSL_LIBRARIES=/lib/x86/delayimp.lib,
+	OPENSSL_CRYPTO_LIBRARY=/lib/x86/delayimp.lib,
+	OPENSSL_CRYPTO_LIBRARIES=/lib/x86/delayimp.lib,
+	OPENSSL_SSL_LIBRARY=/lib/x86/delayimp.lib,
+	OPENSSL_SSL_LIBRARIES=/lib/x86/delayimp.lib,
 	OPENSSL_USE_STATIC_LIBS=TRUE,
 	OPENSSL_MSVC_STATIC_RT=TRUE,
 	OPENSSL_FOUND=TRUE,
@@ -256,7 +256,7 @@ Import.CMake_Variables: [
 	CLIENT_PLUGIN_MYSQL_OLD_PASSWORD=OFF,
 	ZLIB_INCLUDE_DIR=/External/zlib,
 	ZSTD_INCLUDE_DIRS=/External/zstd/lib,
-	ZLIB_LIBRARY=/lib/arm64/delayimp.lib
+	ZLIB_LIBRARY=/lib/x86/delayimp.lib
 ]
 
 Import.CMake_IncludeInHash: [
