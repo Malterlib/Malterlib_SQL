@@ -7,7 +7,8 @@ Repository
 {
 	!!MalterlibRepoName "Malterlib_SQL.git"
 
-	License #<ReuseAnnotations> =+ [{
+	License #<ReuseAnnotations> =+ [
+		{
 			Path: ["SourceGenerated/SQLite/*"]
 			, CopyrightText: "NONE"
 			, LicenseIdentifier: "blessing"
@@ -209,7 +210,6 @@ Property
 	}
 }
 
-
 Property
 {
 	MalterlibLibrary_SQL: bool = MalterlibLibrary_All
@@ -390,7 +390,6 @@ Property
 		}
 	}
 }
-
 
 Property
 {

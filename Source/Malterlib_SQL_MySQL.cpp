@@ -12,7 +12,7 @@ NOTE: Parameter binding (CQueryInstance::f_BindParameter) is NOT supported for M
 #include <Mib/Core/RuntimeType>
 
 #ifdef DPlatformFamily_Windows
-	#include <windows.h>
+#	include <windows.h>
 #endif
 
 #include <mysql.h>
@@ -86,16 +86,12 @@ public:
 		if (m_Columns[_iCol].m_Type == EType_NULL)
 			return CStr();
 
-		switch(m_Columns[_iCol].m_Type)
+		switch (m_Columns[_iCol].m_Type)
 		{
-		case EType_CStr:
-			return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>();
-		case EType_Int64:
-			return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<int64>());
-		case EType_Fp64:
-			return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>());
-		default:
-			return CStr();
+		case EType_CStr: return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>();
+		case EType_Int64: return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<int64>());
+		case EType_Fp64: return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>());
+		default: return CStr();
 		}
 	}
 
@@ -125,7 +121,6 @@ public:
 	{
 		return m_Columns[_iCol].m_Type == EType_NULL;
 	}
-
 
 	virtual TCVector<CCol> const &f_GetFields() override
 	{
@@ -191,7 +186,7 @@ public:
 
 	NStorage::TCUniquePointer<CQueryResult> f_Execute(NMib::NSQL::CDatabaseImplementation *_pImp);
 
-	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
+	virtual bool f_BindParameter(int _iParam, int _TypeID, void const *_pParam)
 	{
 		if (!mp_Params.f_IsPosValid(_iParam))
 			return false;
@@ -200,7 +195,7 @@ public:
 
 		Param.m_TypeID = _TypeID;
 
-		switch(_TypeID)
+		switch (_TypeID)
 		{
 		case 0:
 			{
@@ -209,20 +204,20 @@ public:
 			break;
 		case TCTypeID<NTime::CTime>::ETypeID:
 			{
-				Param.m_Value = fg_GetFullTimeStr(*(NTime::CTime*)_pParam);
+				Param.m_Value = fg_GetFullTimeStr(*(NTime::CTime *)_pParam);
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
 			}
 			break;
 		case TCTypeID<CStr>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
-				Param.m_Value = *(CStr*)_pParam;
+				Param.m_Value = *(CStr *)_pParam;
 			}
 			break;
 		case TCTypeID<CWStr>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
-				Param.m_Value = *(CWStr*)_pParam;
+				Param.m_Value = *(CWStr *)_pParam;
 			}
 			break;
 
@@ -240,53 +235,51 @@ public:
 		case TCTypeID<fp32>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<fp32>::ETypeID;
-				Param.m_Value = (*(fp32*)_pParam).f_Get();
+				Param.m_Value = (*(fp32 *)_pParam).f_Get();
 			}
 			break;
 		case TCTypeID<fp64>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
-				Param.m_Value = (*(fp64*)_pParam).f_Get();
+				Param.m_Value = (*(fp64 *)_pParam).f_Get();
 			}
 			break;
 
 		case TCTypeID<int32>::ETypeID:
 			{
-				Param.m_Value = *(int32*)_pParam;
+				Param.m_Value = *(int32 *)_pParam;
 			}
 			break;
 		case TCTypeID<uint32>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<uint32>::ETypeID;
-				Param.m_Value = *(uint32*)_pParam;
+				Param.m_Value = *(uint32 *)_pParam;
 			}
 			break;
 		case TCTypeID<int64>::ETypeID:
 			{
-				Param.m_Value = *(int64*)_pParam;
+				Param.m_Value = *(int64 *)_pParam;
 			}
 			break;
 		case TCTypeID<uint64>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<uint64>::ETypeID;
-				Param.m_Value = *(uint64*)_pParam;
+				Param.m_Value = *(uint64 *)_pParam;
 			}
 			break;
-		default:
-			return false;
+		default: return false;
 		}
 		return true;
 	}
 };
 
-
 class CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementation
 {
 public:
-
 	CDatabaseImplementation_MySql()
 	{
 	}
+
 	~CDatabaseImplementation_MySql()
 	{
 		DMibSafeCheck(!m_pConn, "Must be deleted");
@@ -311,6 +304,7 @@ public:
 				mysql_server_end();
 		}
 	};
+
 	static CMainThreadCleanup ms_MainThreadCleanup;
 
 	MYSQL *m_pConn = nullptr;
@@ -318,7 +312,7 @@ public:
 	bool m_bTransactionActive = false;
 	bool m_bExecutedStatementInTransaction = false;
 
-	static CFStr1024 fsp_SqlError(MYSQL *_pConn, const ch8 *_pError)
+	static CFStr1024 fsp_SqlError(MYSQL *_pConn, ch8 const *_pError)
 	{
 		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + (_pConn ? mysql_error(_pConn) : "No active connection");
 	}
@@ -330,8 +324,7 @@ public:
 		case CR_SERVER_GONE_ERROR:
 		case CR_SERVER_LOST:
 			return true;
-		default:
-			return false;
+		default: return false;
 		}
 	}
 
@@ -389,7 +382,18 @@ public:
 				DMibLogWithCategory(MySQL, Error, "Failed to set SSL CERT option");
 		}
 
-		MYSQL *pSQL = mysql_real_connect(pConn, Host != "" ? Host.f_GetStr() : nullptr, User != "" ? User.f_GetStr() : nullptr, Password != "" ? Password.f_GetStr() : nullptr, Database != "" ? Database.f_GetStr() : nullptr, Port, nullptr, 0);
+		MYSQL *pSQL = mysql_real_connect
+			(
+				pConn
+				, Host != "" ? Host.f_GetStr() : nullptr
+				, User != "" ? User.f_GetStr() : nullptr
+				, Password != "" ? Password.f_GetStr() : nullptr
+				, Database != "" ? Database.f_GetStr() : nullptr
+				, Port
+				, nullptr
+				, 0
+			)
+		;
 
 		if (!pSQL)
 		{
@@ -403,7 +407,7 @@ public:
 		return true;
 	}
 
-	bool fp_TryReconnectAfterConnectionLoss(unsigned int _ErrorCode, const ch8 *_pOperation)
+	bool fp_TryReconnectAfterConnectionLoss(unsigned int _ErrorCode, ch8 const *_pOperation)
 	{
 		if (!fsp_IsRecoverableConnectionError(_ErrorCode))
 			return false;
@@ -415,7 +419,7 @@ public:
 		return fp_OpenConnection();
 	}
 
-	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters) override
+	virtual bool f_Create(NMib::NContainer::CRegistry const &_Parameters) override
 	{
 		m_Parameters = _Parameters;
 		m_bTransactionActive = false;
@@ -439,16 +443,15 @@ public:
 		}
 	}
 
-	CFStr1024 f_StatementError(MYSQL_STMT *_pStatement, const ch8 *_pError)
+	CFStr1024 f_StatementError(MYSQL_STMT *_pStatement, ch8 const *_pError)
 	{
 		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + mysql_stmt_error(_pStatement);
 	}
 
-	CFStr1024 f_SqlError(const ch8 *_pError)
+	CFStr1024 f_SqlError(ch8 const *_pError)
 	{
 		return fsp_SqlError(m_pConn, _pError);
 	}
-
 
 	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) override
 	{
@@ -521,13 +524,11 @@ public:
 		m_bTransactionActive = false;
 		m_bExecutedStatementInTransaction = false;
 	}
-
 };
 
 CDatabaseImplementation_MySql::CMainThreadCleanup CDatabaseImplementation_MySql::ms_MainThreadCleanup;
 
 DMibRuntimeClassNamedCasted(NMib::NSQL::CDatabaseImplementation, CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation_MySql, NMib::NSQL::CDatabaseImplementation);
-
 
 NStorage::TCUniquePointer<CQueryInstance> CMySqlQuery::f_CreateQueryInstance()
 {
@@ -584,7 +585,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 			auto &Bind = Binds[iP];
 			auto &BindData = BindDatas[iP];
 
-			switch(CurParam.m_TypeID)
+			switch (CurParam.m_TypeID)
 			{
 			case 0:
 				{
@@ -730,7 +731,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 			OutputBind.length = &OutputBindData.m_Length;
 			OutputBind.error = &OutputBindData.m_bError;
 
-			switch(pFields[i].type)
+			switch (pFields[i].type)
 			{
 			case MYSQL_TYPE_SHORT:
 			case MYSQL_TYPE_LONG:
@@ -820,14 +821,10 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 				if (BindData.m_bError || BindData.m_bIsNull)
 					continue;
 
-				switch(pResult->m_Columns[i].m_Type)
+				switch (pResult->m_Columns[i].m_Type)
 				{
-				case NMib::NSQL::CQueryResult::EType_Int64:
-					Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>();
-					break;
-				case NMib::NSQL::CQueryResult::EType_Fp64:
-					Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>();
-					break;
+				case NMib::NSQL::CQueryResult::EType_Int64: Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>(); break;
+				case NMib::NSQL::CQueryResult::EType_Fp64: Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>(); break;
 				case NMib::NSQL::CQueryResult::EType_CStr:
 					{
 						auto &InData = BindData.m_Data.f_GetAsType<CStr>();
@@ -836,9 +833,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 						Row.m_Data[i] = fg_Move(Data);
 					}
 					break;
-				case NMib::NSQL::CQueryResult::EType_NULL:
-					DMibNeverGetHere;
-					break;
+				case NMib::NSQL::CQueryResult::EType_NULL: DMibNeverGetHere; break;
 				}
 			}
 			++iRow;
