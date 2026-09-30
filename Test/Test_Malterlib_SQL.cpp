@@ -16,12 +16,11 @@ namespace
 	class CDB_Tests : public NMib::NTest::CTest
 	{
 	public:
-
 		enum EFlag
 		{
-			EFlag_None			= 0,
-			EFlag_NoBinding		= DMibBit(0),
-			EFlag_MySqlSyntax	= DMibBit(1),
+			EFlag_None          = 0
+			, EFlag_NoBinding   = DMibBit(0)
+			, EFlag_MySqlSyntax = DMibBit(1)
 		};
 
 		void f_DoSQLConnectionTests(NMib::NSQL::CSQLConnection &_SQLConn, EFlag _Flags)
@@ -30,44 +29,44 @@ namespace
 
 			// Test CREATE TABLE
 			TCUniquePointer<NMib::NSQL::CQueryResult> pResults = SQLConn.f_ExecuteBind("CREATE TABLE TestTable (P_Id INTEGER, Name TEXT, PRIMARY KEY (P_Id) )");
-			DMibTest(DMibExpr(pResults)) (ETest_FailAndStop);
+			DMibTest(DMibExpr(pResults))(ETest_FailAndStop);
 
 			// Test INSERT
-			for (int i= 0; i < 100; ++i)
+			for (int i = 0; i < 100; ++i)
 			{
-				pResults =	SQLConn.f_ExecuteBind(CStr(CStr(CStr::CFormat("INSERT INTO TestTable VALUES ({}, '{}')") << i << i)));
-				DMibTest(DMibExpr(pResults) && DMibExpr(2)) (ETest_FailAndStop) (ETestFlag_Aggregated);
-				//					DMibTest(DMibExpr(pResults->f_NumAffectedRows()) == DMibExpr(1)) (ETest_FailAndStop); // SQLite is not obeying the docs here.
+				pResults = SQLConn.f_ExecuteBind(CStr(CStr(CStr::CFormat("INSERT INTO TestTable VALUES ({}, '{}')") << i << i)));
+				DMibTest(DMibExpr(pResults) && DMibExpr(2))(ETest_FailAndStop)(ETestFlag_Aggregated);
+				// DMibTest(DMibExpr(pResults->f_NumAffectedRows()) == DMibExpr(1)) (ETest_FailAndStop); // SQLite is not obeying the docs here.
 			}
 
 			// Test Select
-			pResults =	SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id < 50 ORDER BY P_Id ASC");
-			DMibTest(DMibExpr(!pResults.f_IsEmpty())) (ETest_FailAndStop);
-			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50)) (ETest_FailAndStop);
+			pResults = SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id < 50 ORDER BY P_Id ASC");
+			DMibTest(DMibExpr(!pResults.f_IsEmpty()))(ETest_FailAndStop);
+			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50))(ETest_FailAndStop);
 
 			int64 Val, Req;
-			for (int64 i= 0; i < 50; ++i)
+			for (int64 i = 0; i < 50; ++i)
 			{
 				Req = i;
 				Val = pResults->f_GetInt64(i, 0);
-				DMibTest(DMibExpr(Val) == DMibExpr(Req)) (ETest_FailAndStop) (ETestFlag_Aggregated);
+				DMibTest(DMibExpr(Val) == DMibExpr(Req))(ETest_FailAndStop)(ETestFlag_Aggregated);
 			}
 
 			// Test DELETE
-			pResults =	SQLConn.f_ExecuteBind("DELETE FROM TestTable WHERE P_Id < 50");
-			DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(2)) (ETest_FailAndStop);
-			//				DMibTest(DMibExpr(pResults->f_NumAffectedRows()) == DMibExpr(50)) (ETest_FailAndStop);
+			pResults = SQLConn.f_ExecuteBind("DELETE FROM TestTable WHERE P_Id < 50");
+			DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(2))(ETest_FailAndStop);
+			// DMibTest(DMibExpr(pResults->f_NumAffectedRows()) == DMibExpr(50)) (ETest_FailAndStop);
 
 			// Test results of DELETE:
-			pResults =	SQLConn.f_ExecuteBind("SELECT * FROM TestTable ORDER BY P_Id ASC");
-			DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(3)) (ETest_FailAndStop);
-			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50) && DMibExpr(2)) (ETest_FailAndStop);
+			pResults = SQLConn.f_ExecuteBind("SELECT * FROM TestTable ORDER BY P_Id ASC");
+			DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(3))(ETest_FailAndStop);
+			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50) && DMibExpr(2))(ETest_FailAndStop);
 
-			for (int64 i= 0; i < 50; ++i)
+			for (int64 i = 0; i < 50; ++i)
 			{
 				Req = i + 50;
 				Val = pResults->f_GetInt64(i, 0);
-				DMibTest(DMibExpr(Val) == DMibExpr(Req) && DMibExpr(2)) (ETest_FailAndStop) (ETestFlag_Aggregated);
+				DMibTest(DMibExpr(Val) == DMibExpr(Req) && DMibExpr(2))(ETest_FailAndStop)(ETestFlag_Aggregated);
 			}
 
 			// Test Queries with bound params.
@@ -75,21 +74,21 @@ namespace
 			{
 				DMibTestPath("Bound params");
 				TCUniquePointer<NMib::NSQL::CQuery> pParamQuery = SQLConn.f_CreateQuery("SELECT * FROM TestTable WHERE P_Id < ? ORDER BY P_Id ASC");
-				DMibTest(DMibExpr(pParamQuery)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pParamQuery))(ETest_FailAndStop);
 
 				TCUniquePointer<NMib::NSQL::CQueryInstance> pQInst = SQLConn.f_CreateQueryInstance(pParamQuery);
-				DMibTest(DMibExpr(pQInst)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pQInst))(ETest_FailAndStop);
 
-				DMibTest(DMibExpr(pQInst->f_BindParameter<int32>(0, 75)) == DMibExpr(true)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pQInst->f_BindParameter<int32>(0, 75)) == DMibExpr(true))(ETest_FailAndStop);
 
-				pResults =	SQLConn.f_ExecuteQuery(pQInst);
-				DMibTest(DMibExpr(!pResults.f_IsEmpty())) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(25)) (ETest_FailAndStop);
-				for (int64 i= 0; i < 25; ++i)
+				pResults = SQLConn.f_ExecuteQuery(pQInst);
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(25))(ETest_FailAndStop);
+				for (int64 i = 0; i < 25; ++i)
 				{
 					Req = i + 50;
 					Val = pResults->f_GetInt64(i, 0);
-					DMibTest(DMibExpr(Val) == DMibExpr(Req)) (ETest_FailAndStop) (ETestFlag_Aggregated);
+					DMibTest(DMibExpr(Val) == DMibExpr(Req))(ETest_FailAndStop)(ETestFlag_Aggregated);
 				}
 			}
 
@@ -97,62 +96,67 @@ namespace
 			{
 				DMibTestPath("Failing transaction");
 				TCUniquePointer<NMib::NSQL::CTransaction> pTransaction = SQLConn.f_CreateTransaction();
-				DMibTest(DMibExpr(pTransaction)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction))(ETest_FailAndStop);
 
 				// Transaction adding one entry and then deleting one non-existant entry.
 
-
 				TCUniquePointer<NMib::NSQL::CQuery> pQueryOne = SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, '500')");
-				DMibTest(DMibExpr(pQueryOne)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pQueryOne))(ETest_FailAndStop);
 
-				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne)))(ETest_FailAndStop);
 
-				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo = (_Flags & EFlag_MySqlSyntax) ? SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, 'Failure')") : SQLConn.f_CreateQuery("INSERT OR FAIL INTO TestTable VALUES (500, 'Failure')");
-				DMibTest(DMibExpr(pQueryTwo)) (ETest_FailAndStop);
+				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo
+					= (_Flags & EFlag_MySqlSyntax)
+					? SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, 'Failure')")
+					: SQLConn.f_CreateQuery("INSERT OR FAIL INTO TestTable VALUES (500, 'Failure')")
+				;
+				DMibTest(DMibExpr(pQueryTwo))(ETest_FailAndStop);
 
-				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo)))(ETest_FailAndStop);
 
 				TCUniquePointer<NMib::NSQL::CTransactionResult> pTransactionResult = SQLConn.f_CommitTransaction(fg_Move(pTransaction));
-				DMibTest(DMibExpr(!pTransactionResult)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(!pTransactionResult))(ETest_FailAndStop);
 
-				//					pTransactionResult->
+				// pTransactionResult->
 
 				// Test results of Rolledback transaction:
-				pResults =	SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id = 500");
-				DMibTest(DMibExpr(!pResults.f_IsEmpty())) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0)) (ETest_FailAndStop);
+				pResults = SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id = 500");
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0))(ETest_FailAndStop);
 			}
 
 			// Test successful transaction
 			{
 				DMibTestPath("Successful transaction");
 				TCUniquePointer<NMib::NSQL::CTransaction> pTransaction = SQLConn.f_CreateTransaction();
-				DMibTest(DMibExpr(pTransaction)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction))(ETest_FailAndStop);
 
 				// Transaction adding one entry and then deleting one non-existant entry.
 
-
 				TCUniquePointer<NMib::NSQL::CQuery> pQueryOne = SQLConn.f_CreateQuery("INSERT INTO TestTable VALUES (500, '500')");
-				DMibTest(DMibExpr(pQueryOne)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pQueryOne))(ETest_FailAndStop);
 
-				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryOne)))(ETest_FailAndStop);
 
+				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo
+					= (_Flags & EFlag_MySqlSyntax)
+					? SQLConn.f_CreateQuery("REPLACE INTO TestTable VALUES (500, 'Success')")
+					: SQLConn.f_CreateQuery("INSERT OR REPLACE INTO TestTable VALUES (500, 'Success')")
+				;
+				DMibTest(DMibExpr(pQueryTwo))(ETest_FailAndStop);
 
-				TCUniquePointer<NMib::NSQL::CQuery> pQueryTwo = (_Flags & EFlag_MySqlSyntax) ? SQLConn.f_CreateQuery("REPLACE INTO TestTable VALUES (500, 'Success')") : SQLConn.f_CreateQuery("INSERT OR REPLACE INTO TestTable VALUES (500, 'Success')");
-				DMibTest(DMibExpr(pQueryTwo)) (ETest_FailAndStop);
-
-				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransaction->f_AddQuery(pQueryTwo)))(ETest_FailAndStop);
 
 				TCUniquePointer<NMib::NSQL::CTransactionResult> pTransactionResult = SQLConn.f_CommitTransaction(fg_Move(pTransaction));
-				DMibTest(DMibExpr(pTransactionResult)) (ETest_FailAndStop);
+				DMibTest(DMibExpr(pTransactionResult))(ETest_FailAndStop);
 				DMibExpectTrue(pTransaction.f_IsEmpty());
 
-				//					pTransactionResult->
+				// pTransactionResult->
 
 				// Test results of Rolledback transaction:
-				pResults =	SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id = 500");
-				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(6)) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(1)) (ETest_FailAndStop);
+				pResults = SQLConn.f_ExecuteBind("SELECT * FROM TestTable WHERE P_Id = 500");
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(6))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(1))(ETest_FailAndStop);
 
 				int64 ID = pResults->f_GetInt64(0, 0);
 				int64 ReqID = 500;
@@ -166,7 +170,6 @@ namespace
 
 		void f_DoTests()
 		{
-
 			///*
 			DMibTestSuite("SQLite")
 			{
@@ -177,7 +180,7 @@ namespace
 				// Test create DB (in memory)
 				CRegistry Registry;
 				Registry.f_SetValue("Database", ":memory:");
-				DMibTest(DMibExpr(SQLConn.f_Create("NMib::NSQL::CDatabaseImplementation_SQLite", Registry, 1))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(SQLConn.f_Create("NMib::NSQL::CDatabaseImplementation_SQLite", Registry, 1)))(ETest_FailAndStop);
 
 				f_DoSQLConnectionTests(SQLConn, EFlag_None);
 			};
@@ -195,29 +198,27 @@ namespace
 				Registry.f_SetValue("Host", "localhost");
 				Registry.f_SetValue("User", "root");
 				Registry.f_SetValue("Password", "asdasd");
-				DMibTest(DMibExpr(SQLConn.f_Create("NMib::NSQL::CDatabaseImplementation_MySql", Registry, 1))) (ETest_FailAndStop);
+				DMibTest(DMibExpr(SQLConn.f_Create("NMib::NSQL::CDatabaseImplementation_MySql", Registry, 1)))(ETest_FailAndStop);
 
 				TCUniquePointer<NMib::NSQL::CQueryResult> pResults;
 
-				pResults =	SQLConn.f_ExecuteBind("CREATE DATABASE MalterlibCertifierTestDB");
-				DMibTest(DMibExpr(!pResults.f_IsEmpty())) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0)) (ETest_FailAndStop);
+				pResults = SQLConn.f_ExecuteBind("CREATE DATABASE MalterlibCertifierTestDB");
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0))(ETest_FailAndStop);
 
-				pResults =	SQLConn.f_ExecuteBind("USE MalterlibCertifierTestDB");
-				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(2)) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0) && DMibExpr(2)) (ETest_FailAndStop);
+				pResults = SQLConn.f_ExecuteBind("USE MalterlibCertifierTestDB");
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(2))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0) && DMibExpr(2))(ETest_FailAndStop);
 
 				f_DoSQLConnectionTests(SQLConn, EFlag_NoBinding | EFlag_MySqlSyntax);
 
-				pResults =	SQLConn.f_ExecuteBind("DROP DATABASE MalterlibCertifierTestDB");
-				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(3)) (ETest_FailAndStop);
-				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0) && DMibExpr(3)) (ETest_FailAndStop);
+				pResults = SQLConn.f_ExecuteBind("DROP DATABASE MalterlibCertifierTestDB");
+				DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(3))(ETest_FailAndStop);
+				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(0) && DMibExpr(3))(ETest_FailAndStop);
 			};
 			//*/
 #endif
-
 		}
-
 	};
 }
 DMibTestRegister(CDB_Tests, Malterlib::SQL);

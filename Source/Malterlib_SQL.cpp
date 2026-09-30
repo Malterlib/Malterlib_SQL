@@ -45,7 +45,6 @@ namespace NMib::NSQL
 		((CTransactionHandler *)_pContext)->f_HandleTransaction(_pResult);
 	}
 
-
 	CSQLConnection::CTask::CTask(CSQLConnection *_pSQL)
 	{
 		m_pSQL = _pSQL;
@@ -67,7 +66,6 @@ namespace NMib::NSQL
 		mp_QueuedTasks.f_Insert(_pTask);
 		if (_pTask->m_pEvent)
 			_pTask->m_pEvent->f_Signal();
-
 	}
 
 	NStorage::TCUniquePointer<CTransactionResult> CSQLConnection::fp_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction, CDatabaseImplementation *_pImp)
@@ -175,7 +173,7 @@ namespace NMib::NSQL
 		//_pImp->f_CreateQuery()
 	}
 
-	bool CSQLConnection::f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, umint _nWorkerThreads)
+	bool CSQLConnection::f_Create(ch8 const *_pImplementation, NContainer::CRegistry const &_Parameters, umint _nWorkerThreads)
 	{
 		if (mp_pMainImp)
 		{
@@ -232,7 +230,6 @@ namespace NMib::NSQL
 		}
 	}
 
-
 	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst)
 	{
 		mp_pMainImp->f_BeginTransaction();
@@ -255,7 +252,7 @@ namespace NMib::NSQL
 	void CSQLConnection::f_CommitTransaction
 		(
 			NStorage::TCUniquePointer<CTransaction> &&_pTransaction
-			, void * _pContext
+			, void *_pContext
 			, NThread::CSemaphoreAggregate *_pEvent
 			, FTransactionResultCallback *_fCallback
 			, bool _bAsync
@@ -318,7 +315,7 @@ namespace NMib::NSQL
 		return fg_Construct();
 	}
 
-	NStorage::TCUniquePointer<CTransaction> CSQLConnection::f_CreateTransaction(CStr const& _Statements)	// Create a transaction from a list of semi-colon separated statements.
+	NStorage::TCUniquePointer<CTransaction> CSQLConnection::f_CreateTransaction(CStr const &_Statements) // Create a transaction from a list of semi-colon separated statements.
 	{
 		TCUniquePointer<CTransaction> pTransaction = fg_Construct();
 
@@ -341,7 +338,7 @@ namespace NMib::NSQL
 		return pTransaction;
 	}
 
-	NStorage::TCUniquePointer<CQuery> CSQLConnection::f_CreateQuery(const NStr::CStr &_Query)
+	NStorage::TCUniquePointer<CQuery> CSQLConnection::f_CreateQuery(NStr::CStr const &_Query)
 	{
 		return mp_pMainImp->f_CreateQuery(_Query);
 	}
@@ -376,7 +373,7 @@ namespace NMib::NSQL
 		m_bAllowFail = _bAllow;
 	}
 
-//		DMibRuntimeClassBaseNamed(CDatabaseImplementation, NMib::NSQL::CDatabaseImplementation);
+	// DMibRuntimeClassBaseNamed(CDatabaseImplementation, NMib::NSQL::CDatabaseImplementation);
 
 	/*
 	CQuery *CSQLConnection::f_CreateQuery(const NStr::CStr &_Query);
