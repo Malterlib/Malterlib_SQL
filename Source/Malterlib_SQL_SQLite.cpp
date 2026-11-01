@@ -6,7 +6,7 @@
 #include <Mib/Core/RuntimeType>
 
 #ifdef DPlatformFamily_Windows
-	#include <windows.h>
+#	include <windows.h>
 #endif
 
 #include "../SourceGenerated/SQLite/sqlite3.h"
@@ -23,12 +23,13 @@ class CSQLiteQueryInstance;
 class CSQLiteQuery : public CQuery
 {
 private:
-	sqlite3_stmt* mp_pStatement;
+	sqlite3_stmt *mp_pStatement;
 
 	friend class CSQLiteQueryInstance;
-public:
 
-	CSQLiteQuery(sqlite3_stmt* _pStatement) : mp_pStatement(_pStatement)
+public:
+	CSQLiteQuery(sqlite3_stmt *_pStatement)
+		: mp_pStatement(_pStatement)
 	{
 	}
 
@@ -67,7 +68,7 @@ public:
 		m_nFields = 0;
 	}
 
-//	virtual CStr const& f_GetString(int _iRow, int _iCol, CStr &_Dest)
+	// virtual CStr const& f_GetString(int _iRow, int _iCol, CStr &_Dest)
 	virtual CStr f_GetString(int _iRow, int _iCol) override
 	{
 		DMibRequire(m_Rows.f_IsPosValid(_iRow) && m_Columns.f_IsPosValid(_iCol));
@@ -90,16 +91,12 @@ public:
 		if (m_Columns[_iCol].m_Type == EType_NULL)
 			return CStr();
 
-		switch(m_Columns[_iCol].m_Type)
+		switch (m_Columns[_iCol].m_Type)
 		{
-		case EType_CStr:
-			return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>();
-		case EType_Int64:
-			return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<int64>());
-		case EType_Fp64:
-			return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>());
-		default:
-			return CStr();
+		case EType_CStr: return m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>();
+		case EType_Int64: return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<int64>());
+		case EType_Fp64: return CStr::fs_ToStr(m_Rows[_iRow].m_Data[_iCol].f_GetAsType<CStr>());
+		default: return CStr();
 		}
 	}
 
@@ -171,7 +168,7 @@ public:
 class CSQLiteQueryInstance : public CQueryInstance
 {
 private:
-	CSQLiteQuery* mp_pQuery;
+	CSQLiteQuery *mp_pQuery;
 
 	struct CParam
 	{
@@ -189,14 +186,15 @@ private:
 		CParam()
 			: m_ParamIndex(-1)
 			, m_TypeID(0)
-		{}
+		{
+		}
 	};
 
 	TCVector<CParam> mp_Params;
 
 public:
-
-	CSQLiteQueryInstance(CSQLiteQuery* _pQuery) : mp_pQuery(_pQuery)
+	CSQLiteQueryInstance(CSQLiteQuery *_pQuery)
+		: mp_pQuery(_pQuery)
 	{
 		int nParams = sqlite3_bind_parameter_count(mp_pQuery->mp_pStatement);
 		mp_Params.f_SetLen(nParams);
@@ -208,7 +206,7 @@ public:
 
 	TCUniquePointer<CQueryResult> f_Execute(sqlite3 *_pSQLite)
 	{
-		sqlite3_stmt* pStatement = mp_pQuery->mp_pStatement;
+		sqlite3_stmt *pStatement = mp_pQuery->mp_pStatement;
 		int Ret;
 
 		sqlite3_clear_bindings(pStatement);
@@ -217,9 +215,9 @@ public:
 		int nParams = mp_Params.f_GetLen();
 		for (int iP = 0; iP < nParams; ++iP)
 		{
-			CParam const& CurParam = mp_Params[iP];
+			CParam const &CurParam = mp_Params[iP];
 			Ret = -1;
-			switch(CurParam.m_TypeID)
+			switch (CurParam.m_TypeID)
 			{
 			case 0:
 				{
@@ -229,7 +227,7 @@ public:
 			case TCTypeID<CStr>::ETypeID:
 				{
 					CStr UTF8 = CurParam.m_StrValue;
-					Ret = sqlite3_bind_text(pStatement, iP + 1, UTF8.f_GetStr(), -1,  SQLITE_TRANSIENT);
+					Ret = sqlite3_bind_text(pStatement, iP + 1, UTF8.f_GetStr(), -1, SQLITE_TRANSIENT);
 				}
 				break;
 			case TCTypeID<int32>::ETypeID:
@@ -251,12 +249,10 @@ public:
 
 			if (Ret != SQLITE_OK)
 			{
-
 				DMibTrace("SQLite execution binding failed: \"\"\n", CStr(sqlite3_errmsg(_pSQLite)));
 				return nullptr;
 			}
 		}
-
 
 		TCUniquePointer<CSQLiteQueryResult> pResults = fg_Construct();
 
@@ -290,37 +286,38 @@ public:
 
 		// TODO: Cache this per query where possible (Queries not requiring binding.)
 
-		auto FGetColumnType = [] (int _ColType) -> CQueryResult::EType
-		{
-			switch(_ColType)
+		auto FGetColumnType = [](int _ColType) -> CQueryResult::EType
 			{
-			case SQLITE_INTEGER:
+				switch (_ColType)
 				{
-					return CQueryResult::EType_Int64;
-				}
-				break;
-			case SQLITE_FLOAT:
-				{
-					return CQueryResult:: EType_Fp64;
-				}
-				break;
-			case SQLITE_TEXT:
-				{
-					return CQueryResult::EType_CStr;
-				}
-				break;
-			case SQLITE_NULL:
-				{
-					return CQueryResult::EType_NULL;
-				}
-				break;
-			default:
-				{
-					return CQueryResult::EType_CStr;
-				}
-				break;
-			};
-		};
+				case SQLITE_INTEGER:
+					{
+						return CQueryResult::EType_Int64;
+					}
+					break;
+				case SQLITE_FLOAT:
+					{
+						return CQueryResult::EType_Fp64;
+					}
+					break;
+				case SQLITE_TEXT:
+					{
+						return CQueryResult::EType_CStr;
+					}
+					break;
+				case SQLITE_NULL:
+					{
+						return CQueryResult::EType_NULL;
+					}
+					break;
+				default:
+					{
+						return CQueryResult::EType_CStr;
+					}
+					break;
+				};
+			}
+		;
 
 		int nColumns = sqlite3_column_count(pStatement);
 		pResults->m_Columns.f_SetLen(nColumns);
@@ -334,18 +331,16 @@ public:
 
 		pResults->m_nReturnedRows = 0;
 
-		while(Ret == SQLITE_ROW)
+		while (Ret == SQLITE_ROW)
 		{
 			CSQLiteQueryResult::CRow CurRow;
 			CurRow.m_Data.f_SetLen(nColumns);
 
 			for (int iC = 0; iC < nColumns; ++iC)
 			{
-				switch(pResults->m_Columns[iC].m_Type)
+				switch (pResults->m_Columns[iC].m_Type)
 				{
-				case CQueryResult::EType_Int64:
-					CurRow.m_Data[iC] = sqlite3_column_int64(pStatement, iC);
-					break;
+				case CQueryResult::EType_Int64: CurRow.m_Data[iC] = sqlite3_column_int64(pStatement, iC); break;
 				case CQueryResult::EType_Fp64:
 					{
 						double Val = sqlite3_column_double(pStatement, iC);
@@ -354,7 +349,7 @@ public:
 					break;
 				case CQueryResult::EType_CStr:
 					{
-						unsigned char const* pStr = sqlite3_column_text(pStatement, iC);
+						unsigned char const *pStr = sqlite3_column_text(pStatement, iC);
 						if (pStr)
 							CurRow.m_Data[iC] = pStr;
 						else
@@ -368,7 +363,7 @@ public:
 						pResults->m_Columns[iC].m_Type = FGetColumnType(ColType);
 						if (pResults->m_Columns[iC].m_Type != CQueryResult::EType_NULL)
 							--iC;
-//						CurRow.m_Data[iC] = (int64)0;
+						// CurRow.m_Data[iC] = (int64)0;
 					}
 					break;
 				}
@@ -382,16 +377,16 @@ public:
 		return pResults;
 	}
 
-	virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam)
+	virtual bool f_BindParameter(int _iParam, int _TypeID, void const *_pParam)
 	{
 		if (!mp_Params.f_IsPosValid(_iParam))
 			return false;
 
-		CParam& Param = mp_Params[_iParam];
+		CParam &Param = mp_Params[_iParam];
 
 		Param.m_TypeID = _TypeID;
 
-		switch(_TypeID)
+		switch (_TypeID)
 		{
 		case 0:
 			{
@@ -400,20 +395,20 @@ public:
 			break;
 		case TCTypeID<NTime::CTime>::ETypeID:
 			{
-				Param.m_StrValue = fg_GetFullTimeStr(*(NTime::CTime*)_pParam);
+				Param.m_StrValue = fg_GetFullTimeStr(*(NTime::CTime *)_pParam);
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
 			}
 			break;
 		case TCTypeID<CStr>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
-				Param.m_StrValue = *(CStr*)_pParam;
+				Param.m_StrValue = *(CStr *)_pParam;
 			}
 			break;
 		case TCTypeID<CWStr>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
-				Param.m_StrValue = *(CWStr*)_pParam;
+				Param.m_StrValue = *(CWStr *)_pParam;
 			}
 			break;
 
@@ -431,45 +426,43 @@ public:
 		case TCTypeID<fp32>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
-				Param.m_NumericValue.m_DoubleVal = (*(fp32*)_pParam).f_Get();
+				Param.m_NumericValue.m_DoubleVal = (*(fp32 *)_pParam).f_Get();
 			}
 			break;
 		case TCTypeID<fp64>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
-				Param.m_NumericValue.m_DoubleVal = (*(fp64*)_pParam).f_Get();
+				Param.m_NumericValue.m_DoubleVal = (*(fp64 *)_pParam).f_Get();
 			}
 			break;
 
 		case TCTypeID<int32>::ETypeID:
 			{
-				Param.m_NumericValue.m_Int32 = *(int32*)_pParam;
+				Param.m_NumericValue.m_Int32 = *(int32 *)_pParam;
 			}
 			break;
 		case TCTypeID<uint32>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<int64>::ETypeID;
-				Param.m_NumericValue.m_Int64 = (int64)*(uint32*)_pParam;
+				Param.m_NumericValue.m_Int64 = (int64)*(uint32 *)_pParam;
 			}
 			break;
 		case TCTypeID<int64>::ETypeID:
 			{
-				Param.m_NumericValue.m_Int64 = *(int64*)_pParam;
+				Param.m_NumericValue.m_Int64 = *(int64 *)_pParam;
 			}
 			break;
 		case TCTypeID<uint64>::ETypeID:
 			{
 				Param.m_TypeID = TCTypeID<int64>::ETypeID;
-				Param.m_NumericValue.m_Int64 = *(uint64*)_pParam;
+				Param.m_NumericValue.m_Int64 = *(uint64 *)_pParam;
 			}
 			break;
-		default:
-			return false;
+		default: return false;
 		}
 
 		return true;
 	}
-
 };
 
 NStorage::TCUniquePointer<CQueryInstance> CSQLiteQuery::f_CreateQueryInstance()
@@ -478,24 +471,23 @@ NStorage::TCUniquePointer<CQueryInstance> CSQLiteQuery::f_CreateQueryInstance()
 	return pResult;
 }
 
-
 class CDatabaseImplementation_SQLite : public NMib::NSQL::CDatabaseImplementation
 {
 private:
-
 	sqlite3 *mp_pDB;
 
 public:
-
-	CDatabaseImplementation_SQLite() : mp_pDB(nullptr)
+	CDatabaseImplementation_SQLite()
+		: mp_pDB(nullptr)
 	{
 	}
+
 	~CDatabaseImplementation_SQLite()
 	{
 		DMibSafeCheck(!mp_pDB, "Must be deleted");
 	}
 
-	virtual bool f_Create(const NMib::NContainer::CRegistry &_Parameters)
+	virtual bool f_Create(NMib::NContainer::CRegistry const &_Parameters)
 	{
 		DMibCheck(!mp_pDB);
 
@@ -534,8 +526,8 @@ public:
 	TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query)
 	{
 		DMibSafeCheck(!_Query.f_IsEmpty(), "Empty queries are not supported");
-//		DMibDTrace("Creating sqlite query: {}\n", _Query);
-		sqlite3_stmt* pStatement = nullptr;
+		// DMibDTrace("Creating sqlite query: {}\n", _Query);
+		sqlite3_stmt *pStatement = nullptr;
 
 		CStr UTF8Query = _Query;
 
@@ -578,7 +570,6 @@ public:
 	{
 		sqlite3_exec(mp_pDB, "ROLLBACK TRANSACTION", nullptr, nullptr, nullptr);
 	}
-
 };
 
 DMibRuntimeClassNamedCasted(NMib::NSQL::CDatabaseImplementation, CDatabaseImplementation_SQLite, NMib::NSQL::CDatabaseImplementation_SQLite, NMib::NSQL::CDatabaseImplementation);

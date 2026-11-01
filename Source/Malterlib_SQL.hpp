@@ -6,7 +6,7 @@
 namespace NMib::NSQL
 {
 	template <typename ...tfp_CParam>
-	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBind(const NStr::CStr &_Query, tfp_CParam const &...p_Params)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const & ...p_Params)
 	{
 		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
 		if (!pQuery)
@@ -51,7 +51,7 @@ namespace NMib::NSQL
 	}
 
 	template <typename ...tfp_CParam>
-	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBind(NStorage::TCUniquePointer<CQuery> const &_pQuery, tfp_CParam const &...p_Params)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBind(NStorage::TCUniquePointer<CQuery> const &_pQuery, tfp_CParam const & ...p_Params)
 	{
 		NStorage::TCUniquePointer<CQueryInstance> pInst = _pQuery->f_CreateQueryInstance();
 		if (!pInst)
@@ -92,7 +92,7 @@ namespace NMib::NSQL
 	}
 
 	template <typename ...tfp_CParam>
-	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBindWithoutTransaction(const NStr::CStr &_Query, tfp_CParam const &...p_Params)
+	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBindWithoutTransaction(NStr::CStr const &_Query, tfp_CParam const & ...p_Params)
 	{
 		NStorage::TCUniquePointer<CQuery> pQuery = f_CreateQuery(_Query);
 		if (!pQuery)

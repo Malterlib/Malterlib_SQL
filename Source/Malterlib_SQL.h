@@ -14,11 +14,11 @@ namespace NMib::NSQL
 	\*_____________________________________________________________________________*/
 	DMibImpErrorClassDefine(CExceptionDatabase, NException::CException);
 
-#	define DMibErrorDatabase(d_Description) DMibImpError(NMib::NSQL::CExceptionDatabase, d_Description)
+#define DMibErrorDatabase(d_Description) DMibImpError(NMib::NSQL::CExceptionDatabase, d_Description)
 
-#	ifndef DMibPNoShortCuts
-#		define DErrorDatabase DMibErrorDatabase
-#	endif
+#ifndef DMibPNoShortCuts
+#	define DErrorDatabase DMibErrorDatabase
+#endif
 
 	//class CQueryResultIterator
 	//{
@@ -33,16 +33,15 @@ namespace NMib::NSQL
 	//	virtual bool f_OK() = 0;
 	//};
 
-
 	class CQueryResult
 	{
 	public:
 		enum EType
 		{
-			EType_Int64,
-			EType_Fp64,
-			EType_CStr,
-			EType_NULL,
+			EType_Int64
+			, EType_Fp64
+			, EType_CStr
+			, EType_NULL
 		};
 
 		struct CCol
@@ -52,9 +51,11 @@ namespace NMib::NSQL
 		};
 
 	public:
-		virtual ~CQueryResult() {}
+		virtual ~CQueryResult()
+		{
+		}
 
-//			virtual NMib::NStr::CStr const& f_GetString(int _iRow, int _iCol) = 0;
+		// virtual NMib::NStr::CStr const& f_GetString(int _iRow, int _iCol) = 0;
 		virtual NMib::NStr::CStr f_GetString(int _iRow, int _iCol) = 0;
 		virtual NMib::NStr::CStr f_GetAsString(int _iRow, int _iCol) = 0;
 		virtual int64 f_GetInt64(int _iRow, int _iCol) = 0;
@@ -65,8 +66,8 @@ namespace NMib::NSQL
 		virtual EType f_GetFieldType(int _iCol) = 0;
 		virtual NMib::NStr::CStr const &f_GetFieldName(int _iCol) = 0;
 
-//			virtual const ch8 *f_GetData(int _iRow, int _iCol) = 0;
-//			virtual const NContainer::TCVector<const ch8 *> &f_GetFields() = 0;
+		// virtual const ch8 *f_GetData(int _iRow, int _iCol) = 0;
+		// virtual const NContainer::TCVector<const ch8 *> &f_GetFields() = 0;
 
 		virtual aint f_NumReturnedRows() = 0;
 		virtual aint f_NumAffectedRows() = 0;
@@ -80,7 +81,6 @@ namespace NMib::NSQL
 	class CQuery
 	{
 	public:
-
 		CQuery();
 		virtual ~CQuery();
 
@@ -94,10 +94,10 @@ namespace NMib::NSQL
 		{
 		}
 
-		virtual bool f_BindParameter(int _iParam, int _TypeID, void const*_pParam) = 0;
+		virtual bool f_BindParameter(int _iParam, int _TypeID, void const *_pParam) = 0;
 
 		template <typename tf_CType>
-		bool f_BindParameter(int _iParam, tf_CType const& _Data)
+		bool f_BindParameter(int _iParam, tf_CType const &_Data)
 		{
 			return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::ETypeID, &_Data);
 		}
@@ -140,9 +140,11 @@ namespace NMib::NSQL
 	class CDatabaseImplementation
 	{
 	public:
-		virtual ~CDatabaseImplementation(){}
+		virtual ~CDatabaseImplementation()
+		{
+		}
 
-		virtual bool f_Create(const NContainer::CRegistry &_Parameters) = 0;
+		virtual bool f_Create(NContainer::CRegistry const &_Parameters) = 0;
 		virtual void f_Destroy(bool _bDestroyTherad) = 0;
 		virtual NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) = 0;
 
@@ -151,7 +153,6 @@ namespace NMib::NSQL
 		virtual void f_CommitTransaction() = 0;
 		virtual void f_RollbackTransaction() = 0;
 	};
-
 
 	class CTransactionHandler
 	{
@@ -195,7 +196,6 @@ namespace NMib::NSQL
 		class CWorkerThread : public NThread::CThread
 		{
 		public:
-
 			CWorkerThread(CSQLConnection *_pSQL);
 			~CWorkerThread();
 
@@ -216,26 +216,26 @@ namespace NMib::NSQL
 		NStr::CStr mp_Implementation;
 		NContainer::CRegistry mp_Parameters;
 		NStorage::TCUniquePointer<CDatabaseImplementation> mp_pMainImp;
-	public:
 
+	public:
 		CSQLConnection();
 		~CSQLConnection();
 
-		bool f_Create(const ch8 *_pImplementation, const NContainer::CRegistry &_Parameters, umint _nWorkerThreadss);
+		bool f_Create(ch8 const *_pImplementation, NContainer::CRegistry const &_Parameters, umint _nWorkerThreadss);
 
 		void f_Close();
 
-		NStorage::TCUniquePointer<CQuery> f_CreateQuery(const NStr::CStr &_Query);
+		NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr const &_Query);
 		NStorage::TCUniquePointer<CTransaction> f_CreateTransaction();
-		NStorage::TCUniquePointer<CTransaction> f_CreateTransaction(NStr::CStr const& _Statements);	// Create a transaction from a list of semi-colon separated statements.
+		NStorage::TCUniquePointer<CTransaction> f_CreateTransaction(NStr::CStr const &_Statements); // Create a transaction from a list of semi-colon separated statements.
 		NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance(NStorage::TCUniquePointer<CQuery> const &_pQuery);
 
 		template <typename ...tfp_CParam>
-		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBindWithoutTransaction(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBindWithoutTransaction(NStr::CStr const &_Query, tfp_CParam const & ...p_Params);
 		template <typename ...tfp_CParam>
-		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const &...p_Params);
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const & ...p_Params);
 		template <typename ...tfp_CParam>
-		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStorage::TCUniquePointer<CQuery> const &_pQuery, tfp_CParam const &...p_Params);
+		NStorage::TCUniquePointer<CQueryResult> f_ExecuteBind(NStorage::TCUniquePointer<CQuery> const &_pQuery, tfp_CParam const & ...p_Params);
 
 		NStorage::TCUniquePointer<CQueryResult> f_ExecuteQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQueryInst);
 
@@ -244,7 +244,7 @@ namespace NMib::NSQL
 		void f_CommitTransaction
 			(
 				NStorage::TCUniquePointer<CTransaction> &&_pTransaction
-				, void * _pContext
+				, void *_pContext
 				, NThread::CSemaphoreAggregate *_pEvent
 				, FTransactionResultCallback *_fCallback
 				, bool _bAsync
@@ -257,7 +257,7 @@ namespace NMib::NSQL
 }
 
 #ifndef DMibPNoShortCuts
-	using namespace NMib::NSQL;
+using namespace NMib::NSQL;
 #endif
 
 #include "Malterlib_SQL.hpp"
