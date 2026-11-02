@@ -518,12 +518,12 @@ public:
 		}
 	}
 
-	CStr f_SqlError(int _Err, CStr _Error)
+	CStr f_SqlError(int _Err, CStr const &_Error)
 	{
 		return "{} SQLite returned: {}"_f << _Error << sqlite3_errmsg(mp_pDB);
 	}
 
-	TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query)
+	TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr const &_Query)
 	{
 		DMibSafeCheck(!_Query.f_IsEmpty(), "Empty queries are not supported");
 		// DMibDTrace("Creating sqlite query: {}\n", _Query);

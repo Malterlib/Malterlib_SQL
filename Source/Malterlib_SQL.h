@@ -146,7 +146,7 @@ namespace NMib::NSQL
 
 		virtual bool f_Create(NContainer::CRegistry const &_Parameters) = 0;
 		virtual void f_Destroy(bool _bDestroyTherad) = 0;
-		virtual NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) = 0;
+		virtual NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr const &_Query) = 0;
 
 		virtual void f_BeginTransaction() = 0;
 		virtual NStorage::TCUniquePointer<CQueryResult> f_RunQuery(NStorage::TCUniquePointer<CQueryInstance> const &_pQuery) = 0;

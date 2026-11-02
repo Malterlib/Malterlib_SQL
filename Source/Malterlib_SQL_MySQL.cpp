@@ -453,7 +453,7 @@ public:
 		return fsp_SqlError(m_pConn, _pError);
 	}
 
-	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr _Query) override
+	NStorage::TCUniquePointer<CQuery> f_CreateQuery(NStr::CStr const &_Query) override
 	{
 		for (int iAttempt = 0; iAttempt < 2; ++iAttempt)
 		{
