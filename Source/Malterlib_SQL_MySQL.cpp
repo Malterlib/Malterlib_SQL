@@ -309,6 +309,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 	bool m_bTransactionActive = false;
 	bool m_bExecutedStatementInTransaction = false;
 
+private:
 	static CFStr1024 fsp_SqlError(MYSQL *_pConn, ch8 const *_pError)
 	{
 		return CFStr1024(_pError) + CFStr1024(" MySql returned: ") + (_pConn ? mysql_error(_pConn) : "No active connection");
@@ -325,7 +326,8 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 		}
 	}
 
-	bool fp_OpenConnection()
+public:
+	bool f_OpenConnection()
 	{
 		if (m_pConn)
 		{
@@ -404,7 +406,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 		return true;
 	}
 
-	bool fp_TryReconnectAfterConnectionLoss(unsigned int _ErrorCode, ch8 const *_pOperation)
+	bool f_TryReconnectAfterConnectionLoss(unsigned int _ErrorCode, ch8 const *_pOperation)
 	{
 		if (!fsp_IsRecoverableConnectionError(_ErrorCode))
 			return false;
@@ -413,7 +415,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 			return false;
 
 		DMibLogWithCategory(MySQL, Warning, "{}. Reconnecting MySQL session and retrying once.", _pOperation);
-		return fp_OpenConnection();
+		return f_OpenConnection();
 	}
 
 	virtual bool f_Create(NMib::NContainer::CRegistry const &_Parameters) override
@@ -421,7 +423,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 		m_Parameters = _Parameters;
 		m_bTransactionActive = false;
 		m_bExecutedStatementInTransaction = false;
-		return fp_OpenConnection();
+		return f_OpenConnection();
 	}
 
 	virtual void f_Destroy(bool _bDestroyThread) override
@@ -454,7 +456,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 	{
 		for (int iAttempt = 0; iAttempt < 2; ++iAttempt)
 		{
-			if (!m_pConn && !fp_OpenConnection())
+			if (!m_pConn && !f_OpenConnection())
 				return nullptr;
 
 			MYSQL_STMT *pStatement = mysql_stmt_init(m_pConn);
@@ -469,7 +471,7 @@ struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementatio
 
 			if (mysql_stmt_prepare(pStatement, _Query.f_GetStr(), _Query.f_GetLen()))
 			{
-				if (iAttempt == 0 && fp_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing query"))
+				if (iAttempt == 0 && f_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing query"))
 					continue;
 
 				CStr Error = f_StatementError(pStatement, "Failed to prepare statement.");
@@ -539,7 +541,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 	for (int iAttempt = 0; iAttempt < 2; ++iAttempt)
 	{
-		if (!pImp->m_pConn && !pImp->fp_OpenConnection())
+		if (!pImp->m_pConn && !pImp->f_OpenConnection())
 			return nullptr;
 
 		MYSQL_STMT *pStatement = mysql_stmt_init(pImp->m_pConn);
@@ -554,7 +556,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 		if (mysql_stmt_prepare(pStatement, m_pQuery->m_Query.f_GetStr(), m_pQuery->m_Query.f_GetLen()))
 		{
-			if (iAttempt == 0 && pImp->fp_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing statement"))
+			if (iAttempt == 0 && pImp->f_TryReconnectAfterConnectionLoss(mysql_stmt_errno(pStatement), "Lost MySQL connection while preparing statement"))
 				continue;
 
 			m_Error = pImp->f_StatementError(pStatement, "Failed to prepare statement.");
