@@ -5,6 +5,12 @@
 
 namespace NMib::NSQL
 {
+	template <typename tf_CType>
+	bool CQueryInstance::f_BindParameter(int _iParam, tf_CType const &_Data)
+	{
+		return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::mc_TypeID, &_Data);
+	}
+
 	template <typename ...tfp_CParam>
 	NStorage::TCUniquePointer<CQueryResult> CSQLConnection::f_ExecuteBind(NStr::CStr const &_Query, tfp_CParam const & ...p_Params)
 	{

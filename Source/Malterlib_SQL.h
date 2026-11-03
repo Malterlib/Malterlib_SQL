@@ -50,9 +50,7 @@ namespace NMib::NSQL
 		};
 
 	public:
-		virtual ~CQueryResult()
-		{
-		}
+		virtual ~CQueryResult();
 
 		// virtual NMib::NStr::CStr const& f_GetString(int _iRow, int _iCol) = 0;
 		virtual NMib::NStr::CStr f_GetString(int _iRow, int _iCol) = 0;
@@ -87,18 +85,11 @@ namespace NMib::NSQL
 
 	struct CQueryInstance
 	{
-		virtual ~CQueryInstance()
-		{
-		}
+		virtual ~CQueryInstance();
 
 		virtual bool f_BindParameter(int _iParam, int _TypeID, void const *_pParam) = 0;
-
 		template <typename tf_CType>
-		bool f_BindParameter(int _iParam, tf_CType const &_Data)
-		{
-			return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::mc_TypeID, &_Data);
-		}
-
+		bool f_BindParameter(int _iParam, tf_CType const &_Data);
 		bool f_BindParameterNull(int _iParam);
 	};
 
@@ -133,9 +124,7 @@ namespace NMib::NSQL
 
 	struct CDatabaseImplementation
 	{
-		virtual ~CDatabaseImplementation()
-		{
-		}
+		virtual ~CDatabaseImplementation();
 
 		virtual bool f_Create(NContainer::CRegistry const &_Parameters) = 0;
 		virtual void f_Destroy(bool _bDestroyTherad) = 0;

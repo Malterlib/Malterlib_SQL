@@ -11,11 +11,19 @@ namespace NMib::NSQL
 {
 	DMibImpErrorClassImplement(CExceptionDatabase);
 
+	CQueryResult::~CQueryResult()
+	{
+	}
+
 	CQuery::CQuery()
 	{
 	}
 
 	CQuery::~CQuery()
+	{
+	}
+
+	CQueryInstance::~CQueryInstance()
 	{
 	}
 
@@ -34,6 +42,10 @@ namespace NMib::NSQL
 		if (_iQuery < 0 || (umint)_iQuery >= m_Results.f_GetLen())
 			return nullptr;
 		return m_Results[_iQuery].f_Get();
+	}
+
+	CDatabaseImplementation::~CDatabaseImplementation()
+	{
 	}
 
 	CTransactionHandler::~CTransactionHandler()
