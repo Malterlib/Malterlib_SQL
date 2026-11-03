@@ -96,7 +96,7 @@ namespace NMib::NSQL
 		template <typename tf_CType>
 		bool f_BindParameter(int _iParam, tf_CType const &_Data)
 		{
-			return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::ETypeID, &_Data);
+			return f_BindParameter(_iParam, NMib::NMisc::TCTypeID<tf_CType>::mc_TypeID, &_Data);
 		}
 
 		bool f_BindParameterNull(int _iParam);

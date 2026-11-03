@@ -196,23 +196,23 @@ struct CSQLiteQueryInstance : public CQueryInstance
 					Ret = sqlite3_bind_null(pStatement, iP + 1);
 				}
 				break;
-			case TCTypeID<CStr>::ETypeID:
+			case TCTypeID<CStr>::mc_TypeID:
 				{
 					CStr UTF8 = CurParam.m_StrValue;
 					Ret = sqlite3_bind_text(pStatement, iP + 1, UTF8.f_GetStr(), -1, SQLITE_TRANSIENT);
 				}
 				break;
-			case TCTypeID<int32>::ETypeID:
+			case TCTypeID<int32>::mc_TypeID:
 				{
 					Ret = sqlite3_bind_int(pStatement, iP + 1, CurParam.m_NumericValue.m_Int32);
 				}
 				break;
-			case TCTypeID<int64>::ETypeID:
+			case TCTypeID<int64>::mc_TypeID:
 				{
 					Ret = sqlite3_bind_int64(pStatement, iP + 1, CurParam.m_NumericValue.m_Int64);
 				}
 				break;
-			case TCTypeID<fp64>::ETypeID:
+			case TCTypeID<fp64>::mc_TypeID:
 				{
 					Ret = sqlite3_bind_double(pStatement, iP + 1, CurParam.m_NumericValue.m_DoubleVal);
 				}
@@ -365,21 +365,21 @@ struct CSQLiteQueryInstance : public CQueryInstance
 				Param.m_TypeID = 0;
 			}
 			break;
-		case TCTypeID<NTime::CTime>::ETypeID:
+		case TCTypeID<NTime::CTime>::mc_TypeID:
 			{
 				Param.m_StrValue = fg_GetFullTimeStr(*(NTime::CTime *)_pParam);
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 			}
 			break;
-		case TCTypeID<CStr>::ETypeID:
+		case TCTypeID<CStr>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 				Param.m_StrValue = *(CStr *)_pParam;
 			}
 			break;
-		case TCTypeID<CWStr>::ETypeID:
+		case TCTypeID<CWStr>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 				Param.m_StrValue = *(CWStr *)_pParam;
 			}
 			break;
@@ -395,38 +395,38 @@ struct CSQLiteQueryInstance : public CQueryInstance
 		//		Param.m_NumericValue.m_DoubleVal = *(double*)_pData;
 		//	}
 		//	break;
-		case TCTypeID<fp32>::ETypeID:
+		case TCTypeID<fp32>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
+				Param.m_TypeID = TCTypeID<fp64>::mc_TypeID;
 				Param.m_NumericValue.m_DoubleVal = (*(fp32 *)_pParam).f_Get();
 			}
 			break;
-		case TCTypeID<fp64>::ETypeID:
+		case TCTypeID<fp64>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
+				Param.m_TypeID = TCTypeID<fp64>::mc_TypeID;
 				Param.m_NumericValue.m_DoubleVal = (*(fp64 *)_pParam).f_Get();
 			}
 			break;
 
-		case TCTypeID<int32>::ETypeID:
+		case TCTypeID<int32>::mc_TypeID:
 			{
 				Param.m_NumericValue.m_Int32 = *(int32 *)_pParam;
 			}
 			break;
-		case TCTypeID<uint32>::ETypeID:
+		case TCTypeID<uint32>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<int64>::ETypeID;
+				Param.m_TypeID = TCTypeID<int64>::mc_TypeID;
 				Param.m_NumericValue.m_Int64 = (int64)*(uint32 *)_pParam;
 			}
 			break;
-		case TCTypeID<int64>::ETypeID:
+		case TCTypeID<int64>::mc_TypeID:
 			{
 				Param.m_NumericValue.m_Int64 = *(int64 *)_pParam;
 			}
 			break;
-		case TCTypeID<uint64>::ETypeID:
+		case TCTypeID<uint64>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<int64>::ETypeID;
+				Param.m_TypeID = TCTypeID<int64>::mc_TypeID;
 				Param.m_NumericValue.m_Int64 = *(uint64 *)_pParam;
 			}
 			break;

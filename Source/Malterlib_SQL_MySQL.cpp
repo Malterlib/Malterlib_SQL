@@ -190,21 +190,21 @@ struct CMySqlQueryInstance : public CQueryInstance
 				Param.m_TypeID = 0;
 			}
 			break;
-		case TCTypeID<NTime::CTime>::ETypeID:
+		case TCTypeID<NTime::CTime>::mc_TypeID:
 			{
 				Param.m_Value = fg_GetFullTimeStr(*(NTime::CTime *)_pParam);
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 			}
 			break;
-		case TCTypeID<CStr>::ETypeID:
+		case TCTypeID<CStr>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 				Param.m_Value = *(CStr *)_pParam;
 			}
 			break;
-		case TCTypeID<CWStr>::ETypeID:
+		case TCTypeID<CWStr>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<CStr>::ETypeID;
+				Param.m_TypeID = TCTypeID<CStr>::mc_TypeID;
 				Param.m_Value = *(CWStr *)_pParam;
 			}
 			break;
@@ -220,38 +220,38 @@ struct CMySqlQueryInstance : public CQueryInstance
 		//		Param.m_NumericValue.m_DoubleVal = *(double*)_pData;
 		//	}
 		//	break;
-		case TCTypeID<fp32>::ETypeID:
+		case TCTypeID<fp32>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<fp32>::ETypeID;
+				Param.m_TypeID = TCTypeID<fp32>::mc_TypeID;
 				Param.m_Value = (*(fp32 *)_pParam).f_Get();
 			}
 			break;
-		case TCTypeID<fp64>::ETypeID:
+		case TCTypeID<fp64>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<fp64>::ETypeID;
+				Param.m_TypeID = TCTypeID<fp64>::mc_TypeID;
 				Param.m_Value = (*(fp64 *)_pParam).f_Get();
 			}
 			break;
 
-		case TCTypeID<int32>::ETypeID:
+		case TCTypeID<int32>::mc_TypeID:
 			{
 				Param.m_Value = *(int32 *)_pParam;
 			}
 			break;
-		case TCTypeID<uint32>::ETypeID:
+		case TCTypeID<uint32>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<uint32>::ETypeID;
+				Param.m_TypeID = TCTypeID<uint32>::mc_TypeID;
 				Param.m_Value = *(uint32 *)_pParam;
 			}
 			break;
-		case TCTypeID<int64>::ETypeID:
+		case TCTypeID<int64>::mc_TypeID:
 			{
 				Param.m_Value = *(int64 *)_pParam;
 			}
 			break;
-		case TCTypeID<uint64>::ETypeID:
+		case TCTypeID<uint64>::mc_TypeID:
 			{
-				Param.m_TypeID = TCTypeID<uint64>::ETypeID;
+				Param.m_TypeID = TCTypeID<uint64>::mc_TypeID;
 				Param.m_Value = *(uint64 *)_pParam;
 			}
 			break;
@@ -592,7 +592,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = nullptr;
 				}
 				break;
-			case TCTypeID<CStr>::ETypeID:
+			case TCTypeID<CStr>::mc_TypeID:
 				{
 					auto &TypedParam = CurParam.m_Value.f_GetAsType<CStr>();
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
@@ -602,7 +602,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer_length = TypedParam.f_GetLen();
 				}
 				break;
-			case TCTypeID<int32>::ETypeID:
+			case TCTypeID<int32>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
@@ -611,7 +611,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int32>();
 				}
 				break;
-			case TCTypeID<uint32>::ETypeID:
+			case TCTypeID<uint32>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
@@ -620,7 +620,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint32>();
 				}
 				break;
-			case TCTypeID<int64>::ETypeID:
+			case TCTypeID<int64>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
@@ -629,7 +629,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<int64>();
 				}
 				break;
-			case TCTypeID<uint64>::ETypeID:
+			case TCTypeID<uint64>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
@@ -638,7 +638,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<uint64>();
 				}
 				break;
-			case TCTypeID<fp64>::ETypeID:
+			case TCTypeID<fp64>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
@@ -646,7 +646,7 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 					Bind.buffer = (void *)&CurParam.m_Value.f_GetAsType<fp64>();
 				}
 				break;
-			case TCTypeID<fp32>::ETypeID:
+			case TCTypeID<fp32>::mc_TypeID:
 				{
 					BindData.m_Indicator = STMT_INDICATOR_NONE;
 					Bind.u.indicator = &BindData.m_Indicator;
