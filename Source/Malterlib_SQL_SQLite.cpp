@@ -18,16 +18,10 @@ using namespace NContainer;
 using namespace NMisc;
 using namespace NStorage;
 
-class CSQLiteQueryInstance;
+struct CSQLiteQueryInstance;
 
-class CSQLiteQuery : public CQuery
+struct CSQLiteQuery : public CQuery
 {
-private:
-	sqlite3_stmt *mp_pStatement;
-
-	friend class CSQLiteQueryInstance;
-
-public:
 	CSQLiteQuery(sqlite3_stmt *_pStatement)
 		: mp_pStatement(_pStatement)
 	{
@@ -40,11 +34,15 @@ public:
 	}
 
 	virtual NStorage::TCUniquePointer<CQueryInstance> f_CreateQueryInstance() override;
+
+private:
+	sqlite3_stmt *mp_pStatement;
+
+	friend struct CSQLiteQueryInstance;
 };
 
-class CSQLiteQueryResult : public CQueryResult
+struct CSQLiteQueryResult : public CQueryResult
 {
-public:
 	using CValue = NMib::NStorage::TCVariant<int64, fp64, CStr>;
 
 	struct CRow
@@ -165,34 +163,8 @@ public:
 	}
 };
 
-class CSQLiteQueryInstance : public CQueryInstance
+struct CSQLiteQueryInstance : public CQueryInstance
 {
-private:
-	CSQLiteQuery *mp_pQuery;
-
-	struct CParam
-	{
-		umint m_ParamIndex;
-
-		int m_TypeID;
-		CStr m_StrValue;
-		union
-		{
-			int32 m_Int32;
-			int64 m_Int64;
-			double m_DoubleVal;
-		} m_NumericValue;
-
-		CParam()
-			: m_ParamIndex(-1)
-			, m_TypeID(0)
-		{
-		}
-	};
-
-	TCVector<CParam> mp_Params;
-
-public:
 	CSQLiteQueryInstance(CSQLiteQuery *_pQuery)
 		: mp_pQuery(_pQuery)
 	{
@@ -463,6 +435,31 @@ public:
 
 		return true;
 	}
+
+private:
+	CSQLiteQuery *mp_pQuery;
+
+	struct CParam
+	{
+		umint m_ParamIndex;
+
+		int m_TypeID;
+		CStr m_StrValue;
+		union
+		{
+			int32 m_Int32;
+			int64 m_Int64;
+			double m_DoubleVal;
+		} m_NumericValue;
+
+		CParam()
+			: m_ParamIndex(-1)
+			, m_TypeID(0)
+		{
+		}
+	};
+
+	TCVector<CParam> mp_Params;
 };
 
 NStorage::TCUniquePointer<CQueryInstance> CSQLiteQuery::f_CreateQueryInstance()
@@ -471,12 +468,8 @@ NStorage::TCUniquePointer<CQueryInstance> CSQLiteQuery::f_CreateQueryInstance()
 	return pResult;
 }
 
-class CDatabaseImplementation_SQLite : public NMib::NSQL::CDatabaseImplementation
+struct CDatabaseImplementation_SQLite : public NMib::NSQL::CDatabaseImplementation
 {
-private:
-	sqlite3 *mp_pDB;
-
-public:
 	CDatabaseImplementation_SQLite()
 		: mp_pDB(nullptr)
 	{
@@ -570,6 +563,9 @@ public:
 	{
 		sqlite3_exec(mp_pDB, "ROLLBACK TRANSACTION", nullptr, nullptr, nullptr);
 	}
+
+private:
+	sqlite3 *mp_pDB;
 };
 
 DMibRuntimeClassNamedCasted(NMib::NSQL::CDatabaseImplementation, CDatabaseImplementation_SQLite, NMib::NSQL::CDatabaseImplementation_SQLite, NMib::NSQL::CDatabaseImplementation);

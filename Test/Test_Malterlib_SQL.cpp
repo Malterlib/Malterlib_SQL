@@ -13,9 +13,8 @@ void fg_Malterlib_SQL_SQLite_MakeActive();
 
 namespace
 {
-	class CDB_Tests : public NMib::NTest::CTest
+	struct CDB_Tests : public NMib::NTest::CTest
 	{
-	public:
 		enum EFlag
 		{
 			EFlag_None          = 0

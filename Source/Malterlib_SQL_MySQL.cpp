@@ -42,9 +42,8 @@ struct CMySqlQuery : public CQuery
 	int m_nParams = 0;
 };
 
-class CMySqlQueryResult : public CQueryResult
+struct CMySqlQueryResult : public CQueryResult
 {
-public:
 	using CValue = NMib::NStorage::TCVariant<int64, fp64, CStr>;
 
 	struct CRow
@@ -158,19 +157,8 @@ public:
 	}
 };
 
-class CMySqlQueryInstance : public CQueryInstance
+struct CMySqlQueryInstance : public CQueryInstance
 {
-	struct CParam
-	{
-		umint m_ParamIndex = -1;
-		int m_TypeID = 0;
-
-		NStorage::TCVariant<CStr, uint32, int32, uint64, int64, fp64, fp32> m_Value;
-	};
-
-	TCVector<CParam> mp_Params;
-
-public:
 	CMySqlQuery *m_pQuery;
 	CStr m_Error;
 
@@ -271,11 +259,21 @@ public:
 		}
 		return true;
 	}
+
+private:
+	struct CParam
+	{
+		umint m_ParamIndex = -1;
+		int m_TypeID = 0;
+
+		NStorage::TCVariant<CStr, uint32, int32, uint64, int64, fp64, fp32> m_Value;
+	};
+
+	TCVector<CParam> mp_Params;
 };
 
-class CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementation
+struct CDatabaseImplementation_MySql : public NMib::NSQL::CDatabaseImplementation
 {
-public:
 	CDatabaseImplementation_MySql()
 	{
 	}
@@ -285,9 +283,8 @@ public:
 		DMibSafeCheck(!m_pConn, "Must be deleted");
 	}
 
-	class CMainThreadCleanup
+	struct CMainThreadCleanup
 	{
-	public:
 		bool m_bDoneInit;
 		CMainThreadCleanup()
 		{
