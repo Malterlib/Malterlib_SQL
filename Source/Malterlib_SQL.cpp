@@ -190,7 +190,7 @@ namespace NMib::NSQL
 		if (!mp_pMainImp->f_Create(mp_Parameters))
 			return false;
 
-		for (umint i = 0; i < _nWorkerThreads; ++i)
+		for (umint iThread = 0; iThread < _nWorkerThreads; ++iThread)
 		{
 			CWorkerThread *pThread = fg_ConstructObject<CWorkerThread>(NMemory::CDefaultAllocator(), this);
 			mp_FreeThreads.f_Insert(pThread);

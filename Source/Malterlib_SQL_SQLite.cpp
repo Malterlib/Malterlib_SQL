@@ -185,36 +185,36 @@ struct CSQLiteQueryInstance : public CQueryInstance
 		sqlite3_reset(pStatement);
 
 		int nParams = mp_Params.f_GetLen();
-		for (int iP = 0; iP < nParams; ++iP)
+		for (int iParam = 0; iParam < nParams; ++iParam)
 		{
-			CParam const &CurParam = mp_Params[iP];
+			CParam const &CurParam = mp_Params[iParam];
 			Ret = -1;
 			switch (CurParam.m_TypeID)
 			{
 			case 0:
 				{
-					Ret = sqlite3_bind_null(pStatement, iP + 1);
+					Ret = sqlite3_bind_null(pStatement, iParam + 1);
 				}
 				break;
 			case TCTypeID<CStr>::mc_TypeID:
 				{
 					CStr UTF8 = CurParam.m_StrValue;
-					Ret = sqlite3_bind_text(pStatement, iP + 1, UTF8.f_GetStr(), -1, SQLITE_TRANSIENT);
+					Ret = sqlite3_bind_text(pStatement, iParam + 1, UTF8.f_GetStr(), -1, SQLITE_TRANSIENT);
 				}
 				break;
 			case TCTypeID<int32>::mc_TypeID:
 				{
-					Ret = sqlite3_bind_int(pStatement, iP + 1, CurParam.m_NumericValue.m_Int32);
+					Ret = sqlite3_bind_int(pStatement, iParam + 1, CurParam.m_NumericValue.m_Int32);
 				}
 				break;
 			case TCTypeID<int64>::mc_TypeID:
 				{
-					Ret = sqlite3_bind_int64(pStatement, iP + 1, CurParam.m_NumericValue.m_Int64);
+					Ret = sqlite3_bind_int64(pStatement, iParam + 1, CurParam.m_NumericValue.m_Int64);
 				}
 				break;
 			case TCTypeID<fp64>::mc_TypeID:
 				{
-					Ret = sqlite3_bind_double(pStatement, iP + 1, CurParam.m_NumericValue.m_DoubleVal);
+					Ret = sqlite3_bind_double(pStatement, iParam + 1, CurParam.m_NumericValue.m_DoubleVal);
 				}
 				break;
 			}
@@ -294,11 +294,11 @@ struct CSQLiteQueryInstance : public CQueryInstance
 		int nColumns = sqlite3_column_count(pStatement);
 		pResults->m_Columns.f_SetLen(nColumns);
 		int ColType;
-		for (int iC = 0; iC < nColumns; ++iC)
+		for (int iColumn = 0; iColumn < nColumns; ++iColumn)
 		{
-			pResults->m_Columns[iC].m_Name = sqlite3_column_name(pStatement, iC);
-			ColType = sqlite3_column_type(pStatement, iC);
-			pResults->m_Columns[iC].m_Type = FGetColumnType(ColType);
+			pResults->m_Columns[iColumn].m_Name = sqlite3_column_name(pStatement, iColumn);
+			ColType = sqlite3_column_type(pStatement, iColumn);
+			pResults->m_Columns[iColumn].m_Type = FGetColumnType(ColType);
 		}
 
 		pResults->m_nReturnedRows = 0;
@@ -308,34 +308,34 @@ struct CSQLiteQueryInstance : public CQueryInstance
 			CSQLiteQueryResult::CRow CurRow;
 			CurRow.m_Data.f_SetLen(nColumns);
 
-			for (int iC = 0; iC < nColumns; ++iC)
+			for (int iColumn = 0; iColumn < nColumns; ++iColumn)
 			{
-				switch (pResults->m_Columns[iC].m_Type)
+				switch (pResults->m_Columns[iColumn].m_Type)
 				{
-				case CQueryResult::EType_Int64: CurRow.m_Data[iC] = sqlite3_column_int64(pStatement, iC); break;
+				case CQueryResult::EType_Int64: CurRow.m_Data[iColumn] = sqlite3_column_int64(pStatement, iColumn); break;
 				case CQueryResult::EType_Fp64:
 					{
-						double Val = sqlite3_column_double(pStatement, iC);
-						CurRow.m_Data[iC] = fp64(Val);
+						double Val = sqlite3_column_double(pStatement, iColumn);
+						CurRow.m_Data[iColumn] = fp64(Val);
 					}
 					break;
 				case CQueryResult::EType_CStr:
 					{
-						unsigned char const *pStr = sqlite3_column_text(pStatement, iC);
+						unsigned char const *pStr = sqlite3_column_text(pStatement, iColumn);
 						if (pStr)
-							CurRow.m_Data[iC] = pStr;
+							CurRow.m_Data[iColumn] = pStr;
 						else
-							CurRow.m_Data[iC] = CStr();
+							CurRow.m_Data[iColumn] = CStr();
 					}
 					break;
 				case CQueryResult::EType_NULL:
 					{
 						// Check to see if this row is non-null.
-						int ColType = sqlite3_column_type(pStatement, iC);
-						pResults->m_Columns[iC].m_Type = FGetColumnType(ColType);
-						if (pResults->m_Columns[iC].m_Type != CQueryResult::EType_NULL)
-							--iC;
-						// CurRow.m_Data[iC] = (int64)0;
+						int ColType = sqlite3_column_type(pStatement, iColumn);
+						pResults->m_Columns[iColumn].m_Type = FGetColumnType(ColType);
+						if (pResults->m_Columns[iColumn].m_Type != CQueryResult::EType_NULL)
+							--iColumn;
+						// CurRow.m_Data[iColumn] = (int64)0;
 					}
 					break;
 				}

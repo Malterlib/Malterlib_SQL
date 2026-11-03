@@ -578,11 +578,11 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 		BindDatas.f_SetLen(nParams);
 		NMemory::fg_MemClear(Binds.f_GetArray(), Binds.f_GetLen() * sizeof(MYSQL_BIND));
 
-		for (int iP = 0; iP < nParams; ++iP)
+		for (int iParam = 0; iParam < nParams; ++iParam)
 		{
-			CParam const &CurParam = mp_Params[iP];
-			auto &Bind = Binds[iP];
-			auto &BindData = BindDatas[iP];
+			CParam const &CurParam = mp_Params[iParam];
+			auto &Bind = Binds[iParam];
+			auto &BindData = BindDatas[iParam];
 
 			switch (CurParam.m_TypeID)
 			{
@@ -719,18 +719,18 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 
 		NMemory::fg_MemClear(OutputBinds.f_GetArray(), OutputBinds.f_GetLen() * sizeof(MYSQL_BIND));
 
-		for (umint i = 0; i < nFields; ++i)
+		for (umint iField = 0; iField < nFields; ++iField)
 		{
-			NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[i];
-			CurCol.m_Name = pFields[i].name;
-			auto &OutputBind = OutputBinds[i];
-			auto &OutputBindData = OutputBindDatas[i];
+			NMib::NSQL::CQueryResult::CCol &CurCol = pResult->m_Columns[iField];
+			CurCol.m_Name = pFields[iField].name;
+			auto &OutputBind = OutputBinds[iField];
+			auto &OutputBindData = OutputBindDatas[iField];
 
 			OutputBind.is_null = &OutputBindData.m_bIsNull;
 			OutputBind.length = &OutputBindData.m_Length;
 			OutputBind.error = &OutputBindData.m_bError;
 
-			switch (pFields[i].type)
+			switch (pFields[iField].type)
 			{
 			case MYSQL_TYPE_SHORT:
 			case MYSQL_TYPE_LONG:
@@ -813,23 +813,23 @@ NStorage::TCUniquePointer<CQueryResult> CMySqlQueryInstance::f_Execute(NMib::NSQ
 			auto &Row = pResult->m_Rows[iRow];
 			Row.m_Data.f_SetLen(nFields);
 
-			for (umint i = 0; i < nFields; i++)
+			for (umint iField = 0; iField < nFields; iField++)
 			{
-				auto &BindData = OutputBindDatas[i];
+				auto &BindData = OutputBindDatas[iField];
 
 				if (BindData.m_bError || BindData.m_bIsNull)
 					continue;
 
-				switch (pResult->m_Columns[i].m_Type)
+				switch (pResult->m_Columns[iField].m_Type)
 				{
-				case NMib::NSQL::CQueryResult::EType_Int64: Row.m_Data[i] = BindData.m_Data.f_GetAsType<int64>(); break;
-				case NMib::NSQL::CQueryResult::EType_Fp64: Row.m_Data[i] = BindData.m_Data.f_GetAsType<fp64>(); break;
+				case NMib::NSQL::CQueryResult::EType_Int64: Row.m_Data[iField] = BindData.m_Data.f_GetAsType<int64>(); break;
+				case NMib::NSQL::CQueryResult::EType_Fp64: Row.m_Data[iField] = BindData.m_Data.f_GetAsType<fp64>(); break;
 				case NMib::NSQL::CQueryResult::EType_CStr:
 					{
 						auto &InData = BindData.m_Data.f_GetAsType<CStr>();
 						CStr Data;
 						fg_StrCopy(Data, InData.f_GetStr(), fg_Min(65536u, BindData.m_Length));
-						Row.m_Data[i] = fg_Move(Data);
+						Row.m_Data[iField] = fg_Move(Data);
 					}
 					break;
 				case NMib::NSQL::CQueryResult::EType_NULL: DMibNeverGetHere; break;

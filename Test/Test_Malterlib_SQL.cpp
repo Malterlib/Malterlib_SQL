@@ -31,9 +31,9 @@ namespace
 			DMibTest(DMibExpr(pResults))(ETest_FailAndStop);
 
 			// Test INSERT
-			for (int i = 0; i < 100; ++i)
+			for (int iRow = 0; iRow < 100; ++iRow)
 			{
-				pResults = SQLConn.f_ExecuteBind(CStr(CStr(CStr::CFormat("INSERT INTO TestTable VALUES ({}, '{}')") << i << i)));
+				pResults = SQLConn.f_ExecuteBind(CStr(CStr(CStr::CFormat("INSERT INTO TestTable VALUES ({}, '{}')") << iRow << iRow)));
 				DMibTest(DMibExpr(pResults) && DMibExpr(2))(ETest_FailAndStop)(ETestFlag_Aggregated);
 				// DMibTest(DMibExpr(pResults->f_NumAffectedRows()) == DMibExpr(1)) (ETest_FailAndStop); // SQLite is not obeying the docs here.
 			}
@@ -44,10 +44,10 @@ namespace
 			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50))(ETest_FailAndStop);
 
 			int64 Val, Req;
-			for (int64 i = 0; i < 50; ++i)
+			for (int64 iRow = 0; iRow < 50; ++iRow)
 			{
-				Req = i;
-				Val = pResults->f_GetInt64(i, 0);
+				Req = iRow;
+				Val = pResults->f_GetInt64(iRow, 0);
 				DMibTest(DMibExpr(Val) == DMibExpr(Req))(ETest_FailAndStop)(ETestFlag_Aggregated);
 			}
 
@@ -61,10 +61,10 @@ namespace
 			DMibTest(DMibExpr(!pResults.f_IsEmpty()) && DMibExpr(3))(ETest_FailAndStop);
 			DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(50) && DMibExpr(2))(ETest_FailAndStop);
 
-			for (int64 i = 0; i < 50; ++i)
+			for (int64 iRow = 0; iRow < 50; ++iRow)
 			{
-				Req = i + 50;
-				Val = pResults->f_GetInt64(i, 0);
+				Req = iRow + 50;
+				Val = pResults->f_GetInt64(iRow, 0);
 				DMibTest(DMibExpr(Val) == DMibExpr(Req) && DMibExpr(2))(ETest_FailAndStop)(ETestFlag_Aggregated);
 			}
 
@@ -83,10 +83,10 @@ namespace
 				pResults = SQLConn.f_ExecuteQuery(pQInst);
 				DMibTest(DMibExpr(!pResults.f_IsEmpty()))(ETest_FailAndStop);
 				DMibTest(DMibExpr(pResults->f_NumReturnedRows()) == DMibExpr(25))(ETest_FailAndStop);
-				for (int64 i = 0; i < 25; ++i)
+				for (int64 iRow = 0; iRow < 25; ++iRow)
 				{
-					Req = i + 50;
-					Val = pResults->f_GetInt64(i, 0);
+					Req = iRow + 50;
+					Val = pResults->f_GetInt64(iRow, 0);
 					DMibTest(DMibExpr(Val) == DMibExpr(Req))(ETest_FailAndStop)(ETestFlag_Aggregated);
 				}
 			}
