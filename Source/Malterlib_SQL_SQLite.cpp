@@ -258,7 +258,7 @@ struct CSQLiteQueryInstance : public CQueryInstance
 
 		// TODO: Cache this per query where possible (Queries not requiring binding.)
 
-		auto FGetColumnType = [](int _ColType) -> CQueryResult::EType
+		auto fGetColumnType = [](int _ColType) -> CQueryResult::EType
 			{
 				switch (_ColType)
 				{
@@ -298,7 +298,7 @@ struct CSQLiteQueryInstance : public CQueryInstance
 		{
 			pResults->m_Columns[iColumn].m_Name = sqlite3_column_name(pStatement, iColumn);
 			ColType = sqlite3_column_type(pStatement, iColumn);
-			pResults->m_Columns[iColumn].m_Type = FGetColumnType(ColType);
+			pResults->m_Columns[iColumn].m_Type = fGetColumnType(ColType);
 		}
 
 		pResults->m_nReturnedRows = 0;
@@ -332,7 +332,7 @@ struct CSQLiteQueryInstance : public CQueryInstance
 					{
 						// Check to see if this row is non-null.
 						int ColType = sqlite3_column_type(pStatement, iColumn);
-						pResults->m_Columns[iColumn].m_Type = FGetColumnType(ColType);
+						pResults->m_Columns[iColumn].m_Type = fGetColumnType(ColType);
 						if (pResults->m_Columns[iColumn].m_Type != CQueryResult::EType_NULL)
 							--iColumn;
 						// CurRow.m_Data[iColumn] = (int64)0;

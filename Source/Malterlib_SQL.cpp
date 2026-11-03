@@ -77,11 +77,11 @@ namespace NMib::NSQL
 		NStorage::TCUniquePointer<CTransactionResult> pResult = fg_Construct();
 		pResult->m_Results.f_SetLen(pTransaction->m_nTransactions);
 		int iResult = 0;
-		CTransaction::CQueryIter Iter = pTransaction->m_Transactions;
+		CTransaction::CQueryIter iQuery = pTransaction->m_Transactions;
 
-		while (Iter)
+		while (iQuery)
 		{
-			auto pRes = _pImp->f_RunQuery(Iter->m_pQueryInstance);
+			auto pRes = _pImp->f_RunQuery(iQuery->m_pQueryInstance);
 			if (!pRes && !pTransaction->m_bAllowFail)
 			{
 				_pImp->f_RollbackTransaction();
@@ -89,7 +89,7 @@ namespace NMib::NSQL
 			}
 			pResult->m_Results[iResult++] = fg_Move(pRes);
 
-			++Iter;
+			++iQuery;
 		}
 
 		_pImp->f_CommitTransaction();
