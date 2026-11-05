@@ -49,7 +49,6 @@ namespace NMib::NSQL
 			NMib::NStr::CStr m_Name;
 		};
 
-	public:
 		virtual ~CQueryResult();
 
 		// virtual NMib::NStr::CStr const& f_GetString(int _iRow, int _iCol) = 0;
@@ -95,9 +94,11 @@ namespace NMib::NSQL
 
 	struct CTransactionResult
 	{
-		NContainer::TCVector<NStorage::TCUniquePointer<CQueryResult>> m_Results;
 		~CTransactionResult();
+
 		CQueryResult *f_GetQueryResult(aint _iQuery);
+
+		NContainer::TCVector<NStorage::TCUniquePointer<CQueryResult>> m_Results;
 	};
 
 	struct CTransaction
@@ -108,16 +109,18 @@ namespace NMib::NSQL
 			NStorage::TCUniquePointer<CQueryInstance> m_pQueryInstance;
 		};
 
-		DMibListLinkD_List(CQueryLink, m_Link) m_Transactions;
 		using CQueryIter = DMibListLinkD_Iter(CQueryLink, m_Link);
-		int m_nTransactions;
-		bool m_bAllowFail;
-		NContainer::TCVector<NStorage::TCUniquePointer<CQuery>> m_OwnedQueries;
 
 		~CTransaction();
 		CTransaction();
+
 		NStorage::TCUniquePointer<CQueryInstance> const &f_AddQuery(NStorage::TCUniquePointer<CQuery> const &_pQuery);
 		void f_SetAllowFail(bool _bAllow);
+
+		DMibListLinkD_List(CQueryLink, m_Link) m_Transactions;
+		int m_nTransactions;
+		bool m_bAllowFail;
+		NContainer::TCVector<NStorage::TCUniquePointer<CQuery>> m_OwnedQueries;
 	};
 
 	using FTransactionResultCallback = void (NStorage::TCUniquePointer<CTransactionResult> const &_pResult, void *_pContext);
@@ -187,6 +190,8 @@ namespace NMib::NSQL
 			CTask(CSQLConnection *_pSQL);
 			~CTask();
 
+			void f_Run(CDatabaseImplementation *_pImp);
+
 			DMibListLinkD_Link(CTask, m_Link);
 
 			CSQLConnection *m_pSQL;
@@ -197,18 +202,9 @@ namespace NMib::NSQL
 			bool m_bAsync;
 
 			NStorage::TCUniquePointer<CTransactionResult> m_pResult;
-
-			void f_Run(CDatabaseImplementation *_pImp);
 		};
 
-		NThread::CMutual mp_QueueLock;
-		DMibListLinkD_List(CTask, m_Link) mp_QueuedTasks;
-
 		using CTaskIter = DMibListLinkD_Iter(CTask, m_Link);
-
-		void fp_QueueTask(CTask *_pTask);
-
-		NStorage::TCUniquePointer<CTransactionResult> fp_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction, CDatabaseImplementation *_pImp);
 
 		struct CWorkerThread : public NThread::CThread
 		{
@@ -222,6 +218,13 @@ namespace NMib::NSQL
 			DMibListLinkD_Link(CWorkerThread, m_Link);
 			CTask *m_pTask = nullptr;
 		};
+
+		void fp_QueueTask(CTask *_pTask);
+
+		NStorage::TCUniquePointer<CTransactionResult> fp_CommitTransaction(NStorage::TCUniquePointer<CTransaction> &&_pTransaction, CDatabaseImplementation *_pImp);
+
+		NThread::CMutual mp_QueueLock;
+		DMibListLinkD_List(CTask, m_Link) mp_QueuedTasks;
 
 		NThread::CMutual mp_ThreadsLock;
 		NThread::CEventAutoReset mp_ThreadEvent;
