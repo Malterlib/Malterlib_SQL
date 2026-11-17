@@ -8,7 +8,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -209,7 +209,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -222,6 +222,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_TLS",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"PLUGIN_DYNAMIC=1",
 			"parsec_EXPORTS"
 		]
 	}
@@ -258,7 +259,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -271,6 +272,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"HAVE_TLS",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"PLUGIN_DYNAMIC=1",
 			"zstd_EXPORTS"
 		]
 	}
@@ -300,7 +302,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -310,11 +312,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
-			"MARIADB_SYSTEM_TYPE=\"Linux\""
+			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -515,7 +520,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -525,11 +530,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
-			"MARIADB_SYSTEM_TYPE=\"Linux\""
+			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -561,7 +569,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -571,11 +579,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86_64\"",
 			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD",
 			"libmariadb_EXPORTS"
 		]
 	}
@@ -639,6 +650,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 	%Dependency "Lib_mariadb-connector-c_mariadbclient"
 	{
 		Dependency.Link false
+		Dependency.Stage "Compile"
 	}
 }
 %Target "Com_mariadb-connector-c_mariadb_config"
@@ -650,7 +662,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/boringssl/include`->MakeAbsolute(),
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),

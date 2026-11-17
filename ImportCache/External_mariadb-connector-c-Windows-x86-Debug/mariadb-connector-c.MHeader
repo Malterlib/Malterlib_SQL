@@ -8,7 +8,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -22,9 +22,11 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
-			"_CRT_SECURE_NO_WARNINGS"
+			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -44,280 +46,280 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_0.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_isnegative.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_sub.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p1p1_to_p2.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p3_to_cached.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/open.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_1.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_isnonzero.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_tobytes.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p1p1_to_p3.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p3_to_p2.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/sc_muladd.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_add.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_mul.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_add.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p2_0.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_precomp_0.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/sc_reduce.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_cmov.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_neg.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_double_scalarmult.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p2_dbl.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_scalarmult_base.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/sign.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_copy.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_pow22523.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_frombytes.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p3_0.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_sub.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/verify.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_frombytes.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_sq2.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_madd.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p3_dbl.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_tobytes.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_invert.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/fe_sq.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_msub.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/ge_p3_tobytes.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
 			%File `@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10/keypair.c`
 			{
 				Compile.Type "C"
-				Compile.PreprocessorDefines += [
+				Compile.PreprocessorDefines =+ [
 					"HAVE_THREAD_LOCAL"
 				]
 			}
@@ -333,7 +335,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -347,9 +349,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_DEBUG",
 			"parsec_EXPORTS"
 		]
 	}
@@ -360,7 +365,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -374,9 +379,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS",
 			"parsec_EXPORTS"
 		]
 	}
@@ -437,7 +445,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -451,9 +459,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_DEBUG",
 			"auth_gssapi_client_EXPORTS"
 		]
 	}
@@ -464,7 +475,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -478,9 +489,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS",
 			"auth_gssapi_client_EXPORTS"
 		]
 	}
@@ -541,7 +555,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -555,9 +569,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_DEBUG",
 			"pvio_shmem_EXPORTS"
 		]
 	}
@@ -568,7 +585,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -582,9 +599,12 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
+			"PLUGIN_DYNAMIC=1",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS",
 			"pvio_shmem_EXPORTS"
 		]
 	}
@@ -637,7 +657,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -646,17 +666,22 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=4",
+			"THREAD",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
-			"_CRT_SECURE_NO_WARNINGS"
+			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -896,7 +921,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -905,17 +930,22 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=4",
+			"THREAD",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
-			"_CRT_SECURE_NO_WARNINGS"
+			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -947,7 +977,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -956,17 +986,22 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=4",
+			"THREAD",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_DEBUG",
 			"libmariadb_EXPORTS"
 		]
 	}
@@ -977,7 +1012,7 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../..'->MakeAbsolute())/External/zlib`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/pvio`->MakeAbsolute(),
 			`@('.'->MakeAbsolute())/include`->MakeAbsolute(),
-			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c`->MakeAbsolute(),
+			`@(CMakeIntermediateDirectory)/External_mariadb-connector-c/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/include`->MakeAbsolute(),
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/plugins/auth/ref10`->MakeAbsolute(),
@@ -986,17 +1021,22 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=4",
+			"THREAD",
+			"WIN32",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
+			"_WINDOWS",
 			"libmariadb_EXPORTS"
 		]
 	}
