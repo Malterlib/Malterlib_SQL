@@ -126,7 +126,7 @@ Repository
 
 		PreprocessorDefines += ["LIBMARIADB", "HAVE_COMPRESS", "THREAD", "HAVE_THREAD_LOCAL=1"]
 
-		PreprocessorDefines += ["_XOPEN_SOURCE=700", "_DARWIN_C_SOURCE"]
+		PreprocessorDefines += "_DARWIN_C_SOURCE"
 		{
 			&
 			{
