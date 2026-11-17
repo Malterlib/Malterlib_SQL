@@ -646,14 +646,17 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"arm64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=8",
+			"THREAD",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS"
@@ -905,14 +908,17 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"arm64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=8",
+			"THREAD",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS"
@@ -956,14 +962,17 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"arm64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=8",
+			"THREAD",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",
@@ -986,14 +995,17 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/win-iconv`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_DLOPEN",
 			"HAVE_SCHANNEL",
 			"HAVE_TLS",
 			"HAVE_WINCRYPT",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"arm64\"",
 			"MARIADB_SYSTEM_TYPE=\"Windows\"",
 			"NOGDI",
 			"SIZEOF_CHARP=8",
+			"THREAD",
 			"WIN32_LEAN_AND_MEAN",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_WARNINGS",

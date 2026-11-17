@@ -310,11 +310,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
-			"MARIADB_SYSTEM_TYPE=\"Linux\""
+			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -525,11 +528,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
-			"MARIADB_SYSTEM_TYPE=\"Linux\""
+			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD"
 		]
 	}
 	Property.MalterlibTargetNameType "Normal"
@@ -571,11 +577,14 @@ Property.CMakeOutputPath_mariadb\-connector\-c: string = `@('.'->MakeAbsolute())
 			`@('../../../../External/mariadb-connector-c'->MakeAbsolute())/libmariadb`->MakeAbsolute()
 		]
 		PreprocessorDefines += [
+			"HAVE_COMPRESS",
 			"HAVE_OPENSSL",
 			"HAVE_TLS",
 			"LIBICONV_PLUG",
+			"LIBMARIADB",
 			"MARIADB_MACHINE_TYPE=\"x86\"",
 			"MARIADB_SYSTEM_TYPE=\"Linux\"",
+			"THREAD",
 			"libmariadb_EXPORTS"
 		]
 	}
