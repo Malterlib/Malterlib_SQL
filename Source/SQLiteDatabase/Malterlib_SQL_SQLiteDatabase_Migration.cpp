@@ -1295,7 +1295,9 @@ namespace NMib::NSQL::NPrivate
 
 	// Schema application turns foreign key enforcement off, so SQLite drops a table that another table references. The foreign key
 	// check finds no violation in a child without rows, and later writes that check the child's foreign key fail for the missing parent.
-	// SQLite also drops a table that a view reads and keeps the view, which fails once it is used.
+	// SQLite also drops a table that a view reads and keeps the view, which fails once it is used, and keeps a trigger on another table that uses
+	// the dropped table, which fails the statements that fire it. Triggers can't be prepared on their own, so likely references are refused
+	// without resolving names.
 	auto fg_SqliteCheckNoReferencesToDroppedTables(CSQLiteDatabaseHandle &_Database, NContainer::TCVector<NStr::CStr> const &_DroppedTables) -> NConcurrency::TCWrapped<void>
 	{
 		using namespace NStr;
@@ -1325,6 +1327,13 @@ namespace NMib::NSQL::NPrivate
 				auto CheckResult = _Database.f_SelectRaw(CheckSql, {});
 				if (!CheckResult)
 					co_return DMibErrorDatabaseInstance("SQLite view '{}' fails after the migration drops table '{}': {}"_f << ViewName << TableName << CheckResult.f_GetExceptionStr());
+			}
+
+			auto Triggers = co_await _Database.f_SelectRaw(NStr::CStr("SELECT name, sql FROM sqlite_master WHERE type = 'trigger' AND sql IS NOT NULL"), {});
+			for (auto const &Trigger : Triggers.m_Rows)
+			{
+				if (NPrivate::fg_SqlTextHasIdentifierToken(Trigger.m_Values[1].f_GetAsType<NStr::CStr>(), TableName))
+					co_return DMibErrorDatabaseInstance("SQLite trigger '{}' may use table '{}' that the migration drops"_f << Trigger.m_Values[0].f_GetAsType<NStr::CStr>() << TableName);
 			}
 
 			NContainer::TCVector<CSqlValue> Values;

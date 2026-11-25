@@ -2297,6 +2297,32 @@ namespace NMib::NSQL::NTest::NSQLiteDatabase
 			co_return {};
 		};
 
+		DMibTestSuite("SQLite migration rejects dropping a table that a trigger on a kept table uses") -> TCFuture<void>
+		{
+			CStr DatabasePath = NFile::CFile::fs_GetProgramDirectory() / "TestSQLiteDropTableTrigger.sqlite";
+			fg_DeleteSqliteDatabaseFiles(DatabasePath);
+
+			{
+				CSqlDatabaseClient Version1Database(fg_CreateSqliteBackendFactory(DatabasePath)(&NDatabaseBackend::gc_FkVersion1SchemaVersions));
+				co_await Version1Database.f_Open();
+				co_await Version1Database.f_ApplySchema();
+				co_await Version1Database.f_ExecuteRaw(NStr::CStr("CREATE TRIGGER fk_parent_audit AFTER INSERT ON fk_parent BEGIN INSERT INTO fk_child (parent_id) VALUES (NEW.id); END"));
+			}
+
+			CSqlDatabaseClient Version2Database(fg_CreateSqliteBackendFactory(DatabasePath)(&NDatabaseBackend::gc_FkChildDropTableAfterParentRebuildSchemaVersions));
+			co_await Version2Database.f_Open();
+			auto ApplyResult = co_await Version2Database.f_ApplySchema().f_Wrap();
+			DMibAssert(bool(ApplyResult), ==, false);
+			DMibExpect(ApplyResult.f_GetExceptionStr().f_Find("fk_parent_audit"), >=, aint(0));
+
+			// The failed migration keeps the table that the trigger writes
+			co_await Version2Database.f_ExecuteRaw(NStr::CStr("INSERT INTO fk_parent (name) VALUES ('parent')"));
+			CSqlRawResult Children = co_await Version2Database.f_QueryRaw(NStr::CStr("SELECT count(*) AS value FROM fk_child"));
+			DMibExpect(Children.m_Rows[0].m_Values[0].f_GetAsType<int64>(), ==, int64(1));
+
+			co_return {};
+		};
+
 		DMibTestSuite("SQLite rebuild of referenced table preserves child foreign key") -> TCFuture<void>
 		{
 			CStr DatabasePath = NFile::CFile::fs_GetProgramDirectory() / "TestSQLiteFkRebuild.sqlite";
