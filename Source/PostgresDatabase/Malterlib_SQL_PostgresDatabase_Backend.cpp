@@ -1290,6 +1290,8 @@ namespace NMib::NSQL::NPrivate
 			auto Result = co_await _Client(&CPostgresClientActor::f_Execute, fg_Move(IndexesSql));
 			for (auto const &Row : Result.m_Rows)
 			{
+				// Schema versions only add indexes: an index that a previous version declared and the target leaves out stays, also when the
+				// additive sync runs without a rebuild, so the rebuild keeps it like an index made outside the schema
 				bool bSkip = false;
 				for (auto const &Index : _Table.m_Indexes)
 				{

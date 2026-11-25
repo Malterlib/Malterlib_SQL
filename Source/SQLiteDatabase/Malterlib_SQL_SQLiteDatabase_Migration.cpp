@@ -1020,6 +1020,8 @@ namespace NMib::NSQL::NPrivate
 			bool bSkip = false;
 			if (Dependent.m_Values[0].f_GetAsType<NStr::CStr>() == "index")
 			{
+				// Schema versions only add indexes: an index that a previous version declared and the target leaves out stays, also when the
+				// additive sync runs without a rebuild, so the rebuild keeps it like an index made outside the schema
 				for (auto const &Index : _Table.m_Indexes)
 				{
 					if (NPrivate::fg_SqlIdentifiersEqualIgnoringAsciiCase(Index.f_Name(), Dependent.m_Values[1].f_GetAsType<NStr::CStr>()))
